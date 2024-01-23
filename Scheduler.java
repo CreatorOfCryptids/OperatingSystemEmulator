@@ -9,17 +9,22 @@ public class Scheduler {
 
     Scheduler(){
         q = new LinkedList<UserLandProcess>();
-        timer = new Timer(interupt, 250);
+        timer = new Timer(, 250);
     }
 
     public int createProcess(UserLandProcess up){
-        q.add(up);
+        if(up != null)
+            q.add(up);
+
+        if()
         switchProcess();
     }
 
     public void switchProcess(){
         UserLandProcess sendToBack = q.removeFirst();
         currentUP = q.getFirst();
-        q.add(sendToBack);
+        
+        if (!sendToBack.isDone())
+            q.add(sendToBack);
     }
 }

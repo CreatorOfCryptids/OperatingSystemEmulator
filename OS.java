@@ -11,17 +11,20 @@ public class OS {
         CREATE, INIT, IDLE, SWITCH
     }
 
-    public static int createProcess(UserLandProcess up){
+    public static int createProcess(UserLandProcess up) {
         // Reset the parameters
         retval = null;
         parameters.clear();
         // Add paremeters to list
-
+        
         // Set currentCall
         currentCall = CallType.CREATE;
         // TODO: Switch to Kernal
-        kernel.start();
+        try {
+            kernel.start();
+        } catch (Exception e){}
         // Cast and return retval
+        return (int) retval;
     }
 
     public static void startUp(UserLandProcess init){
@@ -32,7 +35,7 @@ public class OS {
         createProcess(new IdleProcess());
     }
 
-    public void switchProcess(){
+    public static void switchProcess(){
         // TODO: Eventually
     }
 

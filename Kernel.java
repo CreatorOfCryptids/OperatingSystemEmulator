@@ -19,7 +19,7 @@ public class Kernel {
 
     public void run(){
         while(true){
-            sem.acquire();
+            sem.acquireUninterruptibly();
             OS.currentCall();
             scheduler.currentUP.run();
         }

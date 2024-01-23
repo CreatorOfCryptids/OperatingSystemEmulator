@@ -4,35 +4,42 @@ abstract class UserLandProcess implements Runnable{
     
     Thread thread = new Thread();
     Semaphore sem = new Semaphore(1);
-    boolean expired;
+    boolean isExpired = false;
     
-    void requestStop(){
-
+    public void requestStop(){
+        isExpired = true;
     }
 
-    abstract void main();
+    public abstract void main();
 
-    boolean isStopped(){
-        if ()
+    public boolean isStopped(){
+        if (sem.availablePermits() == 0)
+            return true;
+        else
+            return false;
     }
 
-    boolean isDone(){
-
+    public boolean isDone(){
+        return !thread.isAlive();
     }
 
-    void start(){
-
+    public void start() throws InterruptedException{
+        sem.release();
     }
 
-    void stop(){
-
+    public void stop() throws InterruptedException{
+        sem.acquire();
     }
 
-    void run(){
-
+    public void run(){
+        sem.acquireUninterruptibly();
+        main();
     }
 
-    void cooperateI(){
-
+    public void cooperate(){
+        if(isExpired == true){
+            isExpired = false;
+            OS.switchProcess();
+        }
     }
 }

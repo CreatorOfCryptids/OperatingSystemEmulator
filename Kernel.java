@@ -17,11 +17,24 @@ public class Kernel {
         sem.release();
     }
 
+    public int createProcess(UserLandProcess up){
+        return scheduler.createProcess(up);
+    }
+
     public void run(){
         while(true){
             sem.acquireUninterruptibly();
-            OS.currentCall();
-            scheduler.currentUP.run();
+            switch (OS.currentCall){
+                case CREATE:
+                    this.createProcess((UserLandProcess)OS.parameters.get(0));
+                case SWITCH:
+                    OS.switchProcess();
+                case IDLE:
+                    // TODO: Later
+                case INIT:
+                    // TODO: Later
+            }
+            scheduler.currentlyRunning.run();
         }
     }
 

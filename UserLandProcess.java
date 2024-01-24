@@ -13,10 +13,7 @@ abstract class UserLandProcess implements Runnable{
     public abstract void main();
 
     public boolean isStopped(){
-        if (sem.availablePermits() == 0)
-            return true;
-        else
-            return false;
+        return (sem.availablePermits() == 0);
     }
 
     public boolean isDone(){

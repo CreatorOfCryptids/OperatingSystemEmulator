@@ -5,11 +5,12 @@ public class Scheduler {
     
     private LinkedList<UserLandProcess> q;
     private Timer timer;
-    public UserLandProcess currentUP;
+    public UserLandProcess currentlyRunning;
 
     Scheduler(){
         q = new LinkedList<UserLandProcess>();
-        timer = new Timer(, 250);
+        timer = new Timer();
+        
     }
 
     public int createProcess(UserLandProcess up){
@@ -22,9 +23,11 @@ public class Scheduler {
 
     public void switchProcess(){
         UserLandProcess sendToBack = q.removeFirst();
-        currentUP = q.getFirst();
-        
+        currentlyRunning = q.getFirst();
+
         if (!sendToBack.isDone())
             q.add(sendToBack);
+        
+        
     }
 }

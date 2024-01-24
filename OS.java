@@ -4,7 +4,7 @@ public class OS {
     
     private static Kernel kernel;
     public static CallType currentCall;
-    public static ArrayList<Object> parameters;
+    public static ArrayList<Object> parameters = new ArrayList<>();
     public static Object retval;
 
     public enum CallType{
@@ -15,14 +15,18 @@ public class OS {
         // Reset the parameters
         retval = null;
         parameters.clear();
+
         // Add paremeters to list
-        
+        parameters.add(up);
+
         // Set currentCall
         currentCall = CallType.CREATE;
-        // TODO: Switch to Kernal
+
+        // Switch to Kernal
         try {
             kernel.start();
         } catch (Exception e){}
+
         // Cast and return retval
         return (int) retval;
     }

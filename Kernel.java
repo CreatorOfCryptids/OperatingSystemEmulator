@@ -13,11 +13,12 @@ public class Kernel {
         thread.start();
     }
 
-    public void start() throws InterruptedException{
+    public void start(){
         sem.release();
     }
 
     public int createProcess(UserLandProcess up){
+        OS.retval = up.getPID();
         return scheduler.createProcess(up);
     }
 
@@ -28,13 +29,14 @@ public class Kernel {
                 case CREATE:
                     this.createProcess((UserLandProcess)OS.parameters.get(0));
                 case SWITCH:
-                    OS.switchProcess();
+                    scheduler.switchProcess();
                 case IDLE:
                     // TODO: Later
                 case INIT:
                     // TODO: Later
             }
-            scheduler.currentlyRunning.run();
+            //scheduler.currentlyRunning.run();
+            
         }
     }
 

@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class OS {
     
-    private static Kernel kernel;
+    private static Kernel kernel = new Kernel();
     public static CallType currentCall;
     public static ArrayList<Object> parameters = new ArrayList<>();
     public static Object retval;
@@ -27,20 +27,18 @@ public class OS {
             kernel.start();
         } catch (Exception e){}
 
-        // Cast and return retval
-        return (int) retval;
+        // return PID
+        return up.getPID();
     }
 
     public static void startUp(UserLandProcess init){
-        kernel = new Kernel();
-
         createProcess(init);
-
         createProcess(new IdleProcess());
     }
 
     public static void switchProcess(){
-        // TODO: Eventually
+        currentCall = CallType.SWITCH;
+        kernel.start();
     }
 
 }

@@ -2,9 +2,11 @@ import java.util.concurrent.Semaphore;
 
 abstract class UserLandProcess implements Runnable{
     
-    Thread thread = new Thread();
-    Semaphore sem = new Semaphore(1);
-    boolean isExpired = false;
+    private Thread thread = new Thread();
+    private Semaphore sem = new Semaphore(1);
+    private boolean isExpired = false;
+    public static int processCount = 0;
+    private int PID = processCount++;
     
     public void requestStop(){
         isExpired = true;
@@ -20,12 +22,12 @@ abstract class UserLandProcess implements Runnable{
         return !thread.isAlive();
     }
 
-    public void start() throws InterruptedException{
+    public void start(){
         sem.release();
     }
 
-    public void stop() throws InterruptedException{
-        sem.acquire();
+    public void stop(){
+        sem.acquireUninterruptibly();
     }
 
     public void run(){
@@ -38,5 +40,9 @@ abstract class UserLandProcess implements Runnable{
             isExpired = false;
             OS.switchProcess();
         }
+    }
+    
+    public int getPID(){
+        return PID;
     }
 }

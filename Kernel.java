@@ -10,6 +10,8 @@ public class Kernel {
         thread = new Thread();
         sem = new Semaphore(1);
 
+        sem.acquireUninterruptibly();
+        
         thread.start();
     }
 
@@ -35,8 +37,7 @@ public class Kernel {
                 case INIT:
                     // TODO: Later
             }
-            //scheduler.currentlyRunning.run();
-            
+            scheduler.currentlyRunning.run();
         }
     }
 

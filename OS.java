@@ -2,9 +2,9 @@ import java.util.ArrayList;
 
 public class OS {
     
-    private static Kernel kernel = new Kernel();
+    private static Kernel kernel;
     public static CallType currentCall;
-    public static ArrayList<Object> parameters = new ArrayList<>();
+    public static ArrayList<Object> parameters = new ArrayList<Object>();
     public static Object retval;
 
     public enum CallType{
@@ -22,16 +22,17 @@ public class OS {
         // Set currentCall
         currentCall = CallType.CREATE;
 
-        // Switch to Kernal
-        try {
-            kernel.start();
-        } catch (Exception e){}
+        // Switch to Kernal\
+        kernel.start();
 
         // return PID
         return up.getPID();
     }
 
     public static void startUp(UserLandProcess init){
+        
+        kernel = new Kernel();
+
         createProcess(init);
         createProcess(new IdleProcess());
     }

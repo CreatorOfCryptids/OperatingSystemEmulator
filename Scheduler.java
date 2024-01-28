@@ -31,18 +31,19 @@ public class Scheduler {
         if(q.size() == 1)
             up.start();
 
-        return q.size()-1;
+        return up.getPID();
     }
 
     public void switchProcess(){
 
-        // Stop current process
+        // Stop current process if exists
         if(currentlyRunning != null)
             currentlyRunning.requestStop();
 
         // Send to back if not done
-        if(currentlyRunning != null && currentlyRunning.isDone())
+        if(currentlyRunning != null && currentlyRunning.isDone() && q.size()>0)
             q.removeFirst();
+        
         else if(q.size() > 0){
             q.add(q.removeFirst());
             currentlyRunning = q.getFirst();

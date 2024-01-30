@@ -10,4 +10,8 @@ public class IdleProcess extends UserLandProcess{
             } catch(Exception e) {}
         }
     }
+
+    public String toString(){
+        return "Idle";
+    }
 }

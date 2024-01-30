@@ -4,7 +4,7 @@ public class OS {
     
     private static Kernel kernel;
     public static CallType currentCall;
-    public static ArrayList<Object> parameters = new ArrayList<Object>();
+    public static ArrayList<Object> parameters;
     public static Object retval;
 
     public enum CallType{
@@ -32,12 +32,14 @@ public class OS {
     public static void startUp(UserLandProcess init){
         
         kernel = new Kernel();
+        parameters = new ArrayList<Object>();
 
         createProcess(init);
         createProcess(new IdleProcess());
     }
 
     public static void switchProcess(){
+        //System.out.println("OS.switch");
         currentCall = CallType.SWITCH;
         kernel.start();
     }

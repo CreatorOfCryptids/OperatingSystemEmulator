@@ -61,10 +61,10 @@ abstract class UserLandProcess implements Runnable{
      * If the task is expired, then it unexpiers it and calles OS.switchProcesss()
      */
     public void cooperate(){
-        if(isExpired == true){
+        //System.out.println("Cooperate");
+        if(isExpired == true)
             isExpired = false;
-            OS.switchProcess();
-        }
+        OS.switchProcess();
     }
     
     /**

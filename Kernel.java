@@ -29,6 +29,7 @@ public class Kernel implements Runnable{
             
             switch (OS.currentCall){
                 case CREATE:
+                    //while(!(OS.parameters.get(0) instanceof UserLandProcess)){}
                     createProcess((UserLandProcess)OS.parameters.get(0));
                     break;
                 case SWITCH:

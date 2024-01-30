@@ -2,11 +2,20 @@ import java.util.concurrent.Semaphore;
 
 abstract class UserLandProcess implements Runnable{
     
-    private Thread thread = new Thread();
-    private Semaphore sem = new Semaphore(1);
-    private boolean isExpired = false;
+    private Thread thread;
+    private Semaphore sem;
+    private boolean isExpired;
     public static int processCount = 0;
-    private int PID = processCount++;
+    private int PID;
+
+    UserLandProcess(){
+        thread = new Thread();
+        sem = new Semaphore(0);
+        isExpired = false;
+        PID = processCount++;
+
+        thread.start();
+    }
     
     /**
      * Sets the boolean indicating that this process' quantum has expired.
@@ -53,7 +62,11 @@ abstract class UserLandProcess implements Runnable{
      * Aquires the semaphore, then calls main.
      */
     public void run(){
-        sem.acquireUninterruptibly();
+        while(thread.isAlive()){
+            try{
+                sem.acquire();
+            } catch(Exception e){}
+        }
         main();
     }
 

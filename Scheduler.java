@@ -5,11 +5,14 @@ import java.util.concurrent.Semaphore;
 
 public class Scheduler {
     
-    private LinkedList<UserLandProcess> q;
-    private Semaphore sem;
-    private Timer timer;
-    public UserLandProcess currentlyRunning;
+    private LinkedList<UserLandProcess> q;  // The queueue of running prosesses.
+    private Semaphore sem;                  // The semaphore that makes sure that the threads don't overlap with eachother.
+    private Timer timer;                    // Schedules an interrupt for every 250 ms
+    public UserLandProcess currentlyRunning;// THe process that is currently running.
 
+    /**
+     * Constructor.
+     */
     Scheduler(){
         q = new LinkedList<UserLandProcess>();
         timer = new Timer();
@@ -18,74 +21,71 @@ public class Scheduler {
         timer.scheduleAtFixedRate(new Interupt(), 250, 250);
     }
 
+    /**
+     * Packages the process into a timerTask.
+     */
     private class Interupt extends TimerTask{
         public void run(){
             switchProcess();
         }
     }
 
+    /**
+     * Adds a kernelland process to the queueue.
+     * @param up The userland process to be added.
+     * @return The PID of the added process.
+     */
     public int createProcess(UserLandProcess up){
-        // Add Kernelland Process to the list.
         sem.acquireUninterruptibly();
 
-        if(up != null)
-            q.add(up);
-
-        //Starts it if its the first one.
-        if(q.size() == 1){
-            currentlyRunning = up;
-            up.start();
+        // Check if the process exists,
+        if(up != null){
+            // If it is the first one, set it to currently running.
+            if(q.isEmpty()){
+                currentlyRunning = up;
+                up.start();
+            }
+            // Otherwize, add it to the end of the queueue.
+            else{
+                q.add(up);
+            }
         }
-
+        
         sem.release();
 
         return up.getPID();
     }
 
+    /**
+     * Switches to the next process in the queue.
+     */
     public void switchProcess(){
-        sem.acquireUninterruptibly();
-
-        //Stop current process, and remove it if is done.
-        if (currentlyRunning != null){
-            // TODO: Fix this shit.
-            if (currentlyRunning.isDone()){
-                q.removeFirst();
-                currentlyRunning.requestStop();
-                currentlyRunning = q.getFirst();
+        try{
+            sem.acquire();
+        } catch (Exception e) {}
+        // Make sure that currently running has been initialized.
+        if (currentlyRunning == null){  // This should mean that the queueue is empty
+            if (!q.isEmpty()){          // But if its not, run the next item.
+                currentlyRunning = q.removeFirst();
+                currentlyRunning.start();
             }
-            else if (q.size()>0){
-                currentlyRunning.requestStop();
-                q.add(q.removeFirst());
-                currentlyRunning = q.getFirst();
-            }
-
+        }
+        else if (!currentlyRunning.isDone()){
+            currentlyRunning.cooperate();
+            q.add(currentlyRunning);
+            currentlyRunning = q.removeFirst();
             currentlyRunning.start();
         }
-        else    
-            System.out.println("There are " + q.size() + " processes in the queueue");
+        else{
+            if (q.isEmpty()){
+                System.out.println("Queueue is empty :/");
+            }
+            else {
+                currentlyRunning = q.removeFirst();
+                currentlyRunning.start();
+            }
+        }
 
         sem.release();
-
-        // // Stop current process if exists
-        // if(currentlyRunning != null)
-        //     currentlyRunning.requestStop();
-
-        // // Send to back if not done
-        // if(currentlyRunning != null && currentlyRunning.isDone() && q.size()>0){
-        //     q.removeFirst();
-        //     currentlyRunning = q.getFirst();
-        //     currentlyRunning.run();
-        // }
-            
-        // else if(q.size() > 0){
-        //     currentlyRunning = q.get(0);
-        //     q.add(q.removeFirst());
-        //     currentlyRunning.run();
-        // }
-        // else
-        //     //new IdleProcess().run();
-        //     System.out.println("There are " + q.size() + " processes in the queueue");
-
-        // Set proccess at begining to currentlly running and run if it exists. Otherwise run idle.
     }
 }

@@ -5,16 +5,16 @@ import java.util.concurrent.Semaphore;
 
 public class Scheduler {
     
-    private LinkedList<UserLandProcess> q;  // The queueue of running prosesses.
-    private Semaphore sem;                  // The semaphore that makes sure that the threads don't overlap with eachother.
-    private Timer timer;                    // Schedules an interrupt for every 250 ms
-    public UserLandProcess currentlyRunning;// THe process that is currently running.
+    private LinkedList<UserLandProcess> queue;  // The queueue of running prosesses.
+    private Semaphore sem;                      // The semaphore that makes sure that the threads don't overlap with eachother.
+    private Timer timer;                        // Schedules an interrupt for every 250 ms
+    public UserLandProcess currentlyRunning;    // THe process that is currently running.
 
     /**
      * Constructor.
      */
     Scheduler(){
-        q = new LinkedList<UserLandProcess>();
+        queue = new LinkedList<UserLandProcess>();
         timer = new Timer();
         sem = new Semaphore(1);
         
@@ -38,16 +38,19 @@ public class Scheduler {
     public int createProcess(UserLandProcess up){
         sem.acquireUninterruptibly();
 
+        System.out.println("Adding process " + up.getClass() + ". There will be " + queue.size() + " processes in the queueue.");
+
+
         // Check if the process exists,
         if(up != null){
             // If it is the first one, set it to currently running.
-            if(q.isEmpty()){
+            if(queue.isEmpty() && currentlyRunning == null){
                 currentlyRunning = up;
                 up.start();
             }
             // Otherwize, add it to the end of the queueue.
             else{
-                q.add(up);
+                queue.addLast(up);
             }
         }
         
@@ -60,28 +63,24 @@ public class Scheduler {
      * Switches to the next process in the queue.
      */
     public void switchProcess(){
-        try{
-            sem.acquire();
-        } catch (Exception e) {}
-        // Make sure that currently running has been initialized.
-        if (currentlyRunning == null){  // This should mean that the queueue is empty
-            if (!q.isEmpty()){          // But if its not, run the next item.
-                currentlyRunning = q.removeFirst();
-                currentlyRunning.start();
-            }
-        }
-        else if (!currentlyRunning.isDone()){
-            currentlyRunning.cooperate();
-            q.add(currentlyRunning);
-            currentlyRunning = q.removeFirst();
+        sem.acquireUninterruptibly();
+
+        // If it has been intitiated, make sure that it is still running
+        if (currentlyRunning.isDone() == false){   // If it is still running, stop it and add it to the end of the queueue.
+            currentlyRunning.requestStop();
+            queue.addLast(currentlyRunning);
+            currentlyRunning = queue.removeFirst();
             currentlyRunning.start();
         }
-        else{
-            if (q.isEmpty()){
+        else{   // Otherwize, set the first item on the queue to be currently running.
+            System.out.println("SCHEDULER: Someone died.");
+            if (queue.size() == 0){    
                 System.out.println("Queueue is empty :/");
+                System.out.println("Currently running: " + currentlyRunning.getClass());
+                //currentlyRunning.run();
             }
             else {
-                currentlyRunning = q.removeFirst();
+                currentlyRunning = queue.removeFirst();
                 currentlyRunning.start();
             }
         }

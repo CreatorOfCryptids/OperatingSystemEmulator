@@ -17,8 +17,10 @@ public class OS {
      * @return The PID of the process.
      */
     public static int createProcess(UserLandProcess up) {
+
+        System.out.println("OS: Creating new Process");
+
         // Reset the parameters
-        retval = null;
         parameters.clear();
 
         // Add paremeters to list
@@ -30,7 +32,8 @@ public class OS {
         // Switch to Kernal
         kernel.start();
 
-        // return PID
+        // TODO: return PID 
+        //return (int) retval;
         return up.getPID();
     }
 
@@ -42,18 +45,34 @@ public class OS {
         
         kernel = new Kernel();
         parameters = new ArrayList<Object>();
+        retval = new Object();
 
         createProcess(init);
         createProcess(new IdleProcess());
     }
 
+    public static void switchProcess(){
+        // Reset the parameters
+        retval = null;
+        parameters.clear();
+
+        // Add paremeters to list
+
+        // Set currentCall
+        currentCall = CallType.SWITCH;
+
+        // Switch to Kernal
+        kernel.start();
+    }
+
     /**
      * Switches the current process.
      */
-    public static void switchProcess(){
+    public static void switchToKernel(){
         //System.out.println("OS.switch");
-        currentCall = CallType.SWITCH;
         kernel.start();
+        //TODO: how stop()?
+        // kernel.scheduler.currentlyRunning.stop();//
     }
 
 }

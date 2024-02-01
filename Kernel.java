@@ -8,7 +8,7 @@ public class Kernel implements Runnable{
     Kernel(){
         scheduler = new Scheduler();
         thread = new Thread(this);
-        sem = new Semaphore(0);
+        sem = new Semaphore(1);
         
         thread.start();
     }
@@ -23,14 +23,17 @@ public class Kernel implements Runnable{
 
     public void run(){
         while(true){
-            try{
-                sem.acquire();
-            } catch (Exception e) {}
-            
+                
+            sem.acquireUninterruptibly();
+
             switch (OS.currentCall){
                 case CREATE:
-                    //while(!(OS.parameters.get(0) instanceof UserLandProcess)){}
-                    createProcess((UserLandProcess)OS.parameters.get(0));
+                    OS.retval = this.createProcess((UserLandProcess) OS.parameters.get(0));
+
+                    /* Testing.
+                    createProcess(new IdleProcess());
+                    createProcess(new GoodbyeWorld());
+                    /**/
                     break;
                 case SWITCH:
                     //System.out.println("kernel.switch");
@@ -43,9 +46,8 @@ public class Kernel implements Runnable{
                     // TODO: Later
                     break;
             }
-            OS.currentCall = OS.CallType.IDLE;
+
             //scheduler.currentlyRunning.run();
-            sem.release();
         }
     }
 }

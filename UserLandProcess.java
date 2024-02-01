@@ -9,10 +9,12 @@ abstract class UserLandProcess implements Runnable{
     private int PID;
 
     UserLandProcess(){
-        thread = new Thread();
-        sem = new Semaphore(0);
+        thread = new Thread(this);
+        sem = new Semaphore(1);
         isExpired = false;
         PID = processCount++;
+
+        stop();
 
         thread.start();
     }
@@ -62,11 +64,7 @@ abstract class UserLandProcess implements Runnable{
      * Aquires the semaphore, then calls main.
      */
     public void run(){
-        while(thread.isAlive()){
-            try{
-                sem.acquire();
-            } catch(Exception e){}
-        }
+        sem.acquireUninterruptibly();
         main();
     }
 
@@ -75,9 +73,13 @@ abstract class UserLandProcess implements Runnable{
      */
     public void cooperate(){
         //System.out.println("Cooperate");
-        if(isExpired == true)
+        if(isExpired == true){
+
             isExpired = false;
-        OS.switchProcess();
+            OS.switchToKernel();
+            stop();
+
+        }
     }
     
     /**

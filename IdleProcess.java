@@ -1,7 +1,7 @@
 public class IdleProcess extends UserLandProcess{
     public void main(){
         while(true){    
-            OS.debug("IDLE: Idle :)");
+            OS.dbMes("IDLE: Idle :)");
             cooperate();
             try {
                 Thread.sleep(50);

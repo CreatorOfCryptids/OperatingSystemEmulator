@@ -8,22 +8,20 @@ public class OS {
     public static Object retval;
 
     public enum CallType{
-        CREATE, INIT, IDLE, SWITCH
+        CREATE, SWITCH
     }
 
     /**
-     * Adds a process to the schedule.
+     * Adds a process to the scheduler.
      * @param up The process to be added.
-     * @return The PID of the process.
+     * @return The PID of the new process.
      */
     public static int createProcess(UserLandProcess up) {
 
-        OS.debug("OS: Creating new Process: " + up.getClass());
+        OS.dbMes("OS: Creating new Process: " + up.getClass());
 
         // Reset the parameters
         parameters.clear();
-
-        // Add paremeters to list
         parameters.add(up);
 
         // Set currentCall
@@ -32,15 +30,11 @@ public class OS {
         // Switch to Kernal
         switchToKernel();
 
-        // TODO: return PID 
-        //while (retval == null){}
-        //return (int) retval;
-        while(true){
+        while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
             try{
                 return (int) retval;
             } catch (Exception e){}
         }
-        //return pid;
     }
 
     /**
@@ -49,7 +43,7 @@ public class OS {
      */
     public static void startUp(UserLandProcess init){
         
-        OS.debug("OS: StartUp");
+        OS.dbMes("OS: StartUp");
 
         kernel = new Kernel();
         parameters = new ArrayList<Object>();
@@ -59,33 +53,36 @@ public class OS {
         createProcess(new IdleProcess());
     }
 
+    /**
+     * Switches to the next process in the queue.
+     */
     public static void switchProcess(){
-        OS.debug("OS: Switching process");
-        // Reset the parameters
+        OS.dbMes("OS: Switching process");
+
         retval = null;
         parameters.clear();
 
-        // Add paremeters to list
-
-        // Set currentCall
         currentCall = CallType.SWITCH;
 
-        // Switch to Kernal
         switchToKernel();
     }
 
     /**
-     * Switches the current process.
+     * Starts the Kernel and stops the current process.
      */
     public static void switchToKernel(){
-        OS.debug("OS: Switching to kernel");
+        OS.dbMes("OS: Switching to kernel");
 
         kernel.start();
 
         kernel.stopCurrentProcesss();
     }
 
-    public static void debug(String message){
+    /**
+     * Prints a message to the terminal to help bebugging.
+     * @param message The message printed to the terminal.
+     */
+    public static void dbMes(String message){
         //System.out.println(message);
     }
 }

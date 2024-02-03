@@ -1,7 +1,8 @@
 import java.util.concurrent.Semaphore;
 
 public class Kernel implements Runnable{
-    public Scheduler scheduler;
+
+    private Scheduler scheduler;
     private Thread thread;
     private Semaphore sem;
 
@@ -13,43 +14,62 @@ public class Kernel implements Runnable{
         thread.start();
     }
 
+    /**
+     * Starts the kernel so It can perform the desired operation.
+     */
     public void start(){
         sem.release();      // Increments the sem allowing the thread to run.
     }
 
-    public int createProcess(UserLandProcess up){
-        return scheduler.createProcess(up);
+    /**
+     * Takes an object. Makes sure that it is a UserlandProcess, then passes it to Scheduler.
+     * @param up The UserlandProcess to send to Scheduler.
+     * @return The PID of the Process, or -1 for an error.
+     */
+    public int createProcess(Object up){
+        if (up instanceof UserLandProcess)
+            return scheduler.createProcess((UserLandProcess)up);
+        else{
+            OS.dbMes("Kernel: Object passed to Create Process was not a UserlandProcess");
+            return -1;
+        }
     }
 
+    /**
+     * Runs the Call left by the OS.
+     */
     public void run(){
+
         while(true){
                 
             sem.acquireUninterruptibly();
 
             switch (OS.currentCall){
                 case CREATE:
-                    OS.debug("KERNEL: Create Process");;
-                    OS.retval = this.createProcess((UserLandProcess) OS.parameters.get(0));
+                    OS.dbMes("KERNEL: Create Process");;
+                    OS.retval = this.createProcess(OS.parameters.get(0));
                     break;
                 case SWITCH:
-                    OS.debug("KERNEL: Switch process");
+                    OS.dbMes("KERNEL: Switch process");
                     scheduler.switchProcess();
                     break;
-                case IDLE:
-                    // TODO: Later
-                    break;
-                case INIT:
-                    // TODO: Later
-                    break;
+                default:
+                    OS.dbMes("KERNEL: Unknown Current Call.");
             }
-            OS.debug("KERNEL: Continuing currentProcess.");
+            
+            OS.dbMes("KERNEL: Continuing currentProcess.");
             scheduler.currentlyRunning.start();
         }
     }
 
+    /**
+     * Stops the currently running process so the kernel can start.
+     */
     public void stopCurrentProcesss() {
-        OS.debug("KERNEL: Stoping current process.");
+
+        OS.dbMes("KERNEL: Stoping current process.");
+
         if (scheduler.currentlyRunning != null)
             scheduler.currentlyRunning.stop();
-        }
+    }
 }

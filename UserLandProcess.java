@@ -10,11 +10,9 @@ abstract class UserLandProcess implements Runnable{
 
     UserLandProcess(){
         thread = new Thread(this);
-        sem = new Semaphore(1);
+        sem = new Semaphore(0);
         isExpired = false;
         PID = processCount++;
-
-        stop();
 
         thread.start();
     }
@@ -23,6 +21,7 @@ abstract class UserLandProcess implements Runnable{
      * Sets the boolean indicating that this process' quantum has expired.
      */
     public void requestStop(){
+        OS.debug("USERLAND PROCESS: Stop Requested.");
         isExpired = true;
     }
 
@@ -50,6 +49,7 @@ abstract class UserLandProcess implements Runnable{
      * Releases (inclements) the semaphore, allowing this thread to run.
      */
     public void start(){
+        OS.debug("USERLAND PROCESS: Start.");
         sem.release();
     }
 
@@ -57,6 +57,7 @@ abstract class UserLandProcess implements Runnable{
      * Acquires (decriments) the semaphore, stoping this thread from running.
      */
     public void stop(){
+        OS.debug("USERLAND PROCESS: Stop()");
         sem.acquireUninterruptibly();
     }
 
@@ -72,7 +73,7 @@ abstract class UserLandProcess implements Runnable{
      * If the task is expired, then it unexpiers it and calles OS.switchProcesss()
      */
     public void cooperate(){
-        OS.debug("Cooperate");
+        OS.debug("USERLAND PROCESS: Cooperate");
         if(isExpired == true){
             isExpired = false;
             OS.switchProcess();

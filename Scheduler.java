@@ -45,7 +45,6 @@ public class Scheduler {
             // If it is the first one, set it to currently running.
             if(queue.isEmpty() && currentlyRunning == null){
                 currentlyRunning = up;
-                up.start();
             }
             // Otherwize, add it to the end of the queueue.
             else{

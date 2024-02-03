@@ -42,7 +42,7 @@ public class Kernel implements Runnable{
                     // TODO: Later
                     break;
             }
-
+            OS.debug("KERNEL: Continuing currentProcess.");
             scheduler.currentlyRunning.start();
         }
     }

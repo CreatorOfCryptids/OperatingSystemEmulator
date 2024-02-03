@@ -78,7 +78,7 @@ public class OS {
      * Switches the current process.
      */
     public static void switchToKernel(){
-        System.out.println("OS: Switching to kernel");
+        OS.debug("OS: Switching to kernel");
 
         kernel.start();
 
@@ -86,6 +86,6 @@ public class OS {
     }
 
     public static void debug(String message){
-        System.out.println(message);
+        //System.out.println(message);
     }
 }

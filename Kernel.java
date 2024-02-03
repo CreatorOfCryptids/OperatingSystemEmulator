@@ -8,7 +8,7 @@ public class Kernel implements Runnable{
     Kernel(){
         scheduler = new Scheduler();
         thread = new Thread(this);
-        sem = new Semaphore(1);
+        sem = new Semaphore(0);
         
         thread.start();
     }
@@ -28,15 +28,11 @@ public class Kernel implements Runnable{
 
             switch (OS.currentCall){
                 case CREATE:
+                    OS.debug("KERNEL: Create Process");;
                     OS.retval = this.createProcess((UserLandProcess) OS.parameters.get(0));
-
-                    /* Testing.
-                    createProcess(new IdleProcess());
-                    createProcess(new GoodbyeWorld());
-                    /**/
                     break;
                 case SWITCH:
-                    //System.out.println("kernel.switch");
+                    OS.debug("KERNEL: Switch process");
                     scheduler.switchProcess();
                     break;
                 case IDLE:
@@ -52,6 +48,7 @@ public class Kernel implements Runnable{
     }
 
     public void stopCurrentProcesss() {
+        OS.debug("KERNEL: Stoping current process.");
         if (scheduler.currentlyRunning != null)
             scheduler.currentlyRunning.stop();
         }

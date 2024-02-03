@@ -26,6 +26,7 @@ public class Scheduler {
      */
     private class Interupt extends TimerTask{
         public void run(){
+            OS.debug("SCHEDULER: Interupt.");
             currentlyRunning.requestStop();
         }
     }
@@ -38,8 +39,6 @@ public class Scheduler {
     public int createProcess(UserLandProcess up){
 
         sem.acquireUninterruptibly();
-
-        System.out.println("Adding process " + up.getClass() + ". There will be " + queue.size() + " processes in the queueue.");
 
         // Check if the process exists,
         if(up != null){
@@ -54,6 +53,8 @@ public class Scheduler {
             }
         }
         
+        OS.debug("SCHEDULER: Added process " + up.getClass() + ". There are " + queue.size() + " processes in the queueue.");
+        
         sem.release();
 
         return up.getPID();
@@ -63,21 +64,24 @@ public class Scheduler {
      * Switches to the next process in the queue.
      */
     public void switchProcess(){
-        sem.acquireUninterruptibly();
 
-        // If it has been intitiated, make sure that it is still alive
+        sem.acquireUninterruptibly();
+        OS.debug("SCHEDULER: Switching Process.");
+        OS.debug("SCHEDULER: currentlyRunning: " + currentlyRunning.getClass());
+
+
+        // Check if the currently Running process is still alive
         if (currentlyRunning.isDone() == false){   // If it is still running, stop it and add it to the end of the queueue.
-            currentlyRunning.stop();
+            OS.debug("SCHEDULER: Case: Still alive.");
             queue.addLast(currentlyRunning);
             currentlyRunning = queue.removeFirst();
             //currentlyRunning.start();
         }
         else{   // Otherwize, set the first item on the queue to be currently running.
-            System.out.println("SCHEDULER: Someone died.");
+            OS.debug("SCHEDULER: Case: Someone died.");
             if (queue.size() == 0){    
-                System.out.println("Queueue is empty :/");
-                System.out.println("Currently running: " + currentlyRunning.getClass());
-                //currentlyRunning.run();
+                OS.debug("SCHEDULER: Queueue is empty :/");
+                OS.debug(" SCHEDULER: Currently running: " + currentlyRunning.getClass());
             }
             else {
                 currentlyRunning = queue.removeFirst();

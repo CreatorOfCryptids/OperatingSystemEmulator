@@ -18,7 +18,7 @@ public class OS {
      */
     public static int createProcess(UserLandProcess up) {
 
-        System.out.println("OS: Creating new Process");
+        OS.debug("OS: Creating new Process: " + up.getClass());
 
         // Reset the parameters
         parameters.clear();
@@ -49,6 +49,8 @@ public class OS {
      */
     public static void startUp(UserLandProcess init){
         
+        OS.debug("OS: StartUp");
+
         kernel = new Kernel();
         parameters = new ArrayList<Object>();
         retval = new Object();
@@ -58,7 +60,7 @@ public class OS {
     }
 
     public static void switchProcess(){
-        System.out.println("OS.switchProcess");
+        OS.debug("OS: Switching process");
         // Reset the parameters
         retval = null;
         parameters.clear();
@@ -76,11 +78,14 @@ public class OS {
      * Switches the current process.
      */
     public static void switchToKernel(){
-        System.out.println("OS.switchToKernel");
+        System.out.println("OS: Switching to kernel");
 
         kernel.start();
 
         kernel.stopCurrentProcesss();
     }
 
+    public static void debug(String message){
+        System.out.println(message);
+    }
 }

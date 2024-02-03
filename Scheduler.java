@@ -26,7 +26,7 @@ public class Scheduler {
      */
     private class Interupt extends TimerTask{
         public void run(){
-            switchProcess();
+            currentlyRunning.requestStop();
         }
     }
 
@@ -36,10 +36,10 @@ public class Scheduler {
      * @return The PID of the added process.
      */
     public int createProcess(UserLandProcess up){
+
         sem.acquireUninterruptibly();
 
         System.out.println("Adding process " + up.getClass() + ". There will be " + queue.size() + " processes in the queueue.");
-
 
         // Check if the process exists,
         if(up != null){
@@ -65,12 +65,12 @@ public class Scheduler {
     public void switchProcess(){
         sem.acquireUninterruptibly();
 
-        // If it has been intitiated, make sure that it is still running
+        // If it has been intitiated, make sure that it is still alive
         if (currentlyRunning.isDone() == false){   // If it is still running, stop it and add it to the end of the queueue.
-            currentlyRunning.requestStop();
+            currentlyRunning.stop();
             queue.addLast(currentlyRunning);
             currentlyRunning = queue.removeFirst();
-            currentlyRunning.start();
+            //currentlyRunning.start();
         }
         else{   // Otherwize, set the first item on the queue to be currently running.
             System.out.println("SCHEDULER: Someone died.");

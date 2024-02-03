@@ -47,7 +47,12 @@ public class Kernel implements Runnable{
                     break;
             }
 
-            //scheduler.currentlyRunning.run();
+            scheduler.currentlyRunning.start();
         }
     }
+
+    public void stopCurrentProcesss() {
+        if (scheduler.currentlyRunning != null)
+            scheduler.currentlyRunning.stop();
+        }
 }

@@ -30,11 +30,17 @@ public class OS {
         currentCall = CallType.CREATE;
 
         // Switch to Kernal
-        kernel.start();
+        switchToKernel();
 
         // TODO: return PID 
+        //while (retval == null){}
         //return (int) retval;
-        return up.getPID();
+        while(true){
+            try{
+                return (int) retval;
+            } catch (Exception e){}
+        }
+        //return pid;
     }
 
     /**
@@ -52,6 +58,7 @@ public class OS {
     }
 
     public static void switchProcess(){
+        System.out.println("OS.switchProcess");
         // Reset the parameters
         retval = null;
         parameters.clear();
@@ -62,17 +69,18 @@ public class OS {
         currentCall = CallType.SWITCH;
 
         // Switch to Kernal
-        kernel.start();
+        switchToKernel();
     }
 
     /**
      * Switches the current process.
      */
     public static void switchToKernel(){
-        //System.out.println("OS.switch");
+        System.out.println("OS.switchToKernel");
+
         kernel.start();
-        //TODO: how stop()?
-        // kernel.scheduler.currentlyRunning.stop();//
+
+        kernel.stopCurrentProcesss();
     }
 
 }

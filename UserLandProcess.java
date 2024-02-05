@@ -65,6 +65,7 @@ abstract class UserLandProcess implements Runnable{
      * Aquires the semaphore, then calls main.
      */
     public void run(){
+        OS.dbMes("USERLAND PROCESS: Run.");
         sem.acquireUninterruptibly();
         main();
     }

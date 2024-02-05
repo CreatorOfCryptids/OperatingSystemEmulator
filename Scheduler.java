@@ -3,7 +3,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 
-public class Scheduler {
+public class Scheduler{
     
     private LinkedList<UserLandProcess> queue;  // The queueue of running prosesses.
     private Semaphore sem;                      // The semaphore that makes sure that the threads don't overlap with eachother.

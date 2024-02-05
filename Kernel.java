@@ -57,7 +57,7 @@ public class Kernel implements Runnable{
                     OS.dbMes("KERNEL: Unknown Current Call.");
             }
             
-            OS.dbMes("KERNEL: Continuing currentProcess.");
+            OS.dbMes("KERNEL: Resuming currentProcess.");
             scheduler.currentlyRunning.start();
         }
     }

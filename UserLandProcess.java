@@ -5,14 +5,11 @@ abstract class UserLandProcess implements Runnable{
     private Thread thread;
     private Semaphore sem;
     private boolean isExpired;
-    public static int processCount = 0;
-    private int PID;
 
     UserLandProcess(){
         thread = new Thread(this);
         sem = new Semaphore(0);
         isExpired = false;
-        PID = processCount++;
 
         thread.start();
     }
@@ -21,7 +18,7 @@ abstract class UserLandProcess implements Runnable{
      * Sets the boolean indicating that this process' quantum has expired.
      */
     public void requestStop(){
-        OS.dbMes("USERLAND PROCESS: Stop Requested.");
+        dbMes("Stop Requested");
         isExpired = true;
     }
 
@@ -49,7 +46,7 @@ abstract class UserLandProcess implements Runnable{
      * Releases (inclements) the semaphore, allowing this thread to run.
      */
     public void start(){
-        OS.dbMes("USERLAND PROCESS: Start.");
+        dbMes("Start");
         sem.release();
     }
 
@@ -57,7 +54,7 @@ abstract class UserLandProcess implements Runnable{
      * Acquires (decriments) the semaphore, stoping this thread from running.
      */
     public void stop(){
-        OS.dbMes("USERLAND PROCESS: Stop()");
+        dbMes("Stop");
         sem.acquireUninterruptibly();
     }
 
@@ -65,7 +62,7 @@ abstract class UserLandProcess implements Runnable{
      * Aquires the semaphore, then calls main.
      */
     public void run(){
-        OS.dbMes("USERLAND PROCESS: Run.");
+        dbMes("Run");
         sem.acquireUninterruptibly();
         main();
     }
@@ -74,19 +71,15 @@ abstract class UserLandProcess implements Runnable{
      * If the task is expired, then it unexpiers it and calles OS.switchProcesss()
      */
     public void cooperate(){
-        OS.dbMes("USERLAND PROCESS: Cooperate");
+        dbMes("Cooperate");
         if(isExpired == true){
             isExpired = false;
             OS.switchProcess();
             //sem.acquireUninterruptibly();
         }
     }
-    
-    /**
-     * EXTRA FUNCTION. Accesses the PID of the Userland Process
-     * @return The PID of the program.
-     */
-    public int getPID(){
-        return PID;
+
+    private void dbMes(String message){
+        OS.dbMes("USERLAND_PROCESS (" + this.getClass() + "): " + message);
     }
 }

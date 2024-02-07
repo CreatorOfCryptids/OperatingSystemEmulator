@@ -26,12 +26,33 @@ public class Kernel implements Runnable{
      * @param up The UserlandProcess to send to Scheduler.
      * @return The PID of the Process, or -1 for an error.
      */
-    public int createProcess(Object up){
+    private int createProcess(Object up){
+
         if (up instanceof UserLandProcess)
             return scheduler.createProcess((UserLandProcess)up);
         else{
-            OS.dbMes("Kernel: Object passed to Create Process was not a UserlandProcess");
+            dbMes("Object passed to Create Process was not a UserlandProcess");
             return -1;
+        }
+
+    }
+
+    /**
+     * 
+     */
+    private void switchProcess(){
+        scheduler.switchProcess();
+    }
+
+    /**
+     * 
+     */
+    private void sleep(Object miliseconds){
+        if (miliseconds instanceof Integer){
+            scheduler.sleep((int)miliseconds);
+        }
+        else{
+            dbMes("Object passed to sleep() was not an int.");
         }
     }
 
@@ -46,18 +67,24 @@ public class Kernel implements Runnable{
 
             switch (OS.currentCall){
                 case CREATE:
-                    OS.dbMes("KERNEL: Create Process");;
+                    dbMes("Create Process");;
                     OS.retval = this.createProcess(OS.parameters.get(0));
                     break;
+
                 case SWITCH:
-                    OS.dbMes("KERNEL: Switch process");
-                    scheduler.switchProcess();
+                    dbMes("Switch process");
+                    switchProcess();
                     break;
+
+                case SLEEP:
+                    sleep(OS.parameters.get(0));
+                    break;
+                
                 default:
-                    OS.dbMes("KERNEL: Unknown Current Call.");
+                    dbMes("Unknown Current Call.");
             }
             
-            OS.dbMes("KERNEL: Resuming currentProcess.");
+            dbMes("Resuming currentProcess.");
             scheduler.currentlyRunning.start();
         }
     }
@@ -67,9 +94,13 @@ public class Kernel implements Runnable{
      */
     public void stopCurrentProcesss() {
 
-        OS.dbMes("KERNEL: Stoping current process.");
+        dbMes("Stoping current process.");
 
         if (scheduler.currentlyRunning != null)
             scheduler.currentlyRunning.stop();
+    }
+
+    private void dbMes(String message){
+        OS.dbMes("KERNEL: " + message);
     }
 }

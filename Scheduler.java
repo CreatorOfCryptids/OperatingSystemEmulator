@@ -2,6 +2,7 @@ import java.util.LinkedList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
+import java.time.Clock;
 
 public class Scheduler{
     
@@ -26,7 +27,7 @@ public class Scheduler{
      */
     private class Interupt extends TimerTask{
         public void run(){
-            OS.dbMes("SCHEDULER: Interupt.");
+            dbMes("Interupt.");
             currentlyRunning.requestStop();
         }
     }
@@ -51,11 +52,11 @@ public class Scheduler{
             }
         }
         
-        OS.dbMes("SCHEDULER: Added process " + up.getClass() + ". There are " + queue.size() + " processes in the queueue.");
+        dbMes("Added process " + up.getClass() + ". There are " + queue.size() + " processes in the queueue.");
         
         sem.release();
 
-        return up.getPID();
+        return 0;
     }
 
     /**
@@ -64,25 +65,36 @@ public class Scheduler{
     public void switchProcess(){
 
         sem.acquireUninterruptibly();
-        OS.dbMes("SCHEDULER: Switching Process.");
-        OS.dbMes("SCHEDULER: currentlyRunning: " + currentlyRunning.getClass());
+        dbMes("Switching Process.");
+        dbMes("currentlyRunning: " + currentlyRunning.getClass());
 
         // Check if the currently Running process is still alive
         if (currentlyRunning.isDone() == false){   // If it is still running, move it to the end of the queueue.
-            OS.dbMes("SCHEDULER: Case: Still alive.");
+            dbMes("Case: Still alive.");
             queue.addLast(currentlyRunning);
             currentlyRunning = queue.removeFirst();
         }
         else{   // Otherwize, set the first item on the queue to be currently running.
-            OS.dbMes("SCHEDULER: Case: Someone died.");
+            dbMes("Case: Someone died.");
             if (queue.size() >= 0){ // Make sure there is something on the queue to run.
                 currentlyRunning = queue.removeFirst();
                 currentlyRunning.start();
             }
             else
-                OS.dbMes("SCHEDULER: Queue is empty :/");
+                dbMes("Queue is empty :/");
         }
 
         sem.release();
+    }
+
+    /**
+     * 
+     */
+    public void sleep(int miliseconds){
+        
+    }
+
+    public void dbMes(String message){
+        OS.dbMes("SCHEDULER: " + message);
     }
 }

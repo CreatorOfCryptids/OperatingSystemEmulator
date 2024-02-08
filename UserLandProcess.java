@@ -46,16 +46,16 @@ abstract class UserLandProcess implements Runnable{
      * Releases (inclements) the semaphore, allowing this thread to run.
      */
     public void start(){
-        dbMes("Start");
         sem.release();
+        dbMes("Start, sem: " + (sem.availablePermits()));
     }
 
     /**
      * Acquires (decriments) the semaphore, stoping this thread from running.
      */
     public void stop(){
-        dbMes("Stop");
         sem.acquireUninterruptibly();
+        dbMes("Stop, sem: " + (sem.availablePermits()));
     }
 
     /**

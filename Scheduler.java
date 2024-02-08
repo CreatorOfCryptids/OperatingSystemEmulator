@@ -66,7 +66,7 @@ public class Scheduler{
 
         sem.acquireUninterruptibly();
         dbMes("Switching Process.");
-        dbMes("currentlyRunning: " + currentlyRunning.getClass());
+        dbMes("currentlyRunning before switch: " + currentlyRunning.getClass());
 
         // Check if the currently Running process is still alive
         if (currentlyRunning.isDone() == false){   // If it is still running, move it to the end of the queueue.
@@ -83,6 +83,8 @@ public class Scheduler{
             else
                 dbMes("Queue is empty :/");
         }
+
+        dbMes("currentlyRunning after switch: " + currentlyRunning.getClass());
 
         sem.release();
     }

@@ -65,6 +65,8 @@ public class Kernel implements Runnable{
                 
             sem.acquireUninterruptibly();
 
+            //stopCurrentProcesss();
+
             switch (OS.currentCall){
                 case CREATE:
                     dbMes("Create Process");;
@@ -84,7 +86,7 @@ public class Kernel implements Runnable{
                     dbMes("Unknown Current Call.");
             }
             
-            dbMes("Resuming currentProcess.");
+            dbMes("Resuming currentProcess: " + scheduler.currentlyRunning.getClass());
             scheduler.currentlyRunning.start();
         }
     }
@@ -94,10 +96,14 @@ public class Kernel implements Runnable{
      */
     public void stopCurrentProcesss() {
 
-        dbMes("Stoping current process.");
-
-        if (scheduler.currentlyRunning != null)
+        if (scheduler.currentlyRunning != null){
+            dbMes("Stopping: " + scheduler.currentlyRunning.getClass());
             scheduler.currentlyRunning.stop();
+        }
+        else{
+            dbMes("Current Process is null");
+        }
+            
     }
 
     private void dbMes(String message){

@@ -30,19 +30,17 @@ public class OS {
 
         // Switch to Kernal
         switchToKernel();
-
+        int errors = 0;
+        //*
         while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
-            int errors = 0;
+            
             try{
                 return (int) retval;
-            } catch (ClassCastException e){
+            } catch (Exception e){
                 errors++;
             }
-            catch(Exception e){
-                dbMes("ERROR: " + e.getMessage());
-            }
             dbMes("ERROR: Cannot be cast :" + errors);
-        }
+        }/**/
     }
 
     /**
@@ -107,6 +105,6 @@ public class OS {
      * @param message The message printed to the terminal.
      */
     public static void dbMes(String message){
-        System.out.println("\t"+message);
+        //System.out.println("\t"+message);
     }
 }

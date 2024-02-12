@@ -11,6 +11,10 @@ public class OS {
         CREATE, SWITCH, SLEEP
     }
 
+    public enum Priority{
+        REALTIME, INTERACTIVE, BACKGROUND
+    }
+
     /**
      * Adds a process to the scheduler.
      * 
@@ -24,6 +28,7 @@ public class OS {
         // Reset the parameters
         parameters.clear();
         parameters.add(up);
+        parameters.add(Priority.INTERACTIVE);
 
         // Set currentCall
         currentCall = CallType.CREATE;
@@ -43,6 +48,26 @@ public class OS {
         }/**/
     }
 
+    public static int createProcess(UserLandProcess up, Priority priority){
+
+        dbMes("OS: Creating new Process: " + up.getClass() + " Priority: " + priority.toString());
+
+        parameters.clear();
+        parameters.add(up);
+        parameters.add(priority);
+
+        currentCall = CallType.CREATE;
+
+        switchToKernel();
+
+        while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
+            try{
+                return (int) retval;
+            } catch (Exception e){}
+            dbMes("ERROR: Cannot be cast");
+        }/**/
+    }
+
     /**
      * Starts the initial process of the OS.
      * 
@@ -57,7 +82,7 @@ public class OS {
         retval = new Object();
 
         createProcess(init);
-        createProcess(new IdleProcess());
+        createProcess(new IdleProcess(), Priority.BACKGROUND);
     }
 
     /**

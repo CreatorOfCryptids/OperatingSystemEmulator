@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
@@ -6,16 +7,30 @@ import java.time.Clock;
 
 public class Scheduler{
     
-    private LinkedList<UserLandProcess> queue;  // The queueue of running prosesses.
-    private Semaphore sem;                      // The semaphore that makes sure that the threads don't overlap with eachother.
-    private Timer timer;                        // Schedules an interrupt for every 250 ms
-    public UserLandProcess currentlyRunning;    // THe process that is currently running.
+    private LinkedList<PCB> realTimeQ;              // The queueues of running prosesses.
+    private LinkedList<PCB> interactiveQ;   
+    private LinkedList<PCB> backgroundQ;
+
+    private LinkedList<SleepingProcess> sleeping;   // The queueue of sleeping processes 
+    private Clock clock;                            // Clock
+
+    private Random rand;
+    private Semaphore sem;                          // The semaphore that makes sure that the threads don't overlap with eachother.
+    private Timer timer;                            // Schedules an interrupt for every 250 ms
+    public PCB currentlyRunning;                    // The process that is currently running.
 
     /**
      * Constructor.
      */
     Scheduler(){
-        queue = new LinkedList<UserLandProcess>();
+        realTimeQ = new LinkedList<PCB>();
+        interactiveQ = new LinkedList<PCB>();
+        backgroundQ = new LinkedList<PCB>();
+
+        sleeping = new LinkedList<SleepingProcess>();
+        clock = Clock.systemUTC();
+
+        rand = new Random();
         timer = new Timer();
         sem = new Semaphore(1);
         
@@ -28,7 +43,15 @@ public class Scheduler{
     private class Interupt extends TimerTask{
         public void run(){
             dbMes("Interupt.");
+            if (currentlyRunning.isStopped()){
+                dbMes("CurrentlyRunning is not running.");
+                
+            }
+
             currentlyRunning.requestStop();
+
+            if(sleeping.isEmpty() == false && sleeping.getFirst().awaken())
+                sleeping.removeFirst();
         }
     }
 
@@ -37,26 +60,31 @@ public class Scheduler{
      * @param up The userland process to be added.
      * @return The PID of the added process.
      */
-    public int createProcess(UserLandProcess up){
+    public int createProcess(UserLandProcess up, OS.Priority priority){
 
         sem.acquireUninterruptibly();
 
-        // Check if the process exists,
-        if(up != null){
-            // If it is the first process, set it to currentlyRunning.
-            if(queue.isEmpty() && currentlyRunning == null){
-                currentlyRunning = up;
-            }
-            else{   // Otherwize, add it to the end of the queueue.
-                queue.addLast(up);
-            }
+        // Check if the process exists, if it doesn't return an error.
+        if(up == null)
+            return -1;
+
+        PCB newProcess = new PCB(up, priority);
+
+        LinkedList<PCB> q = getRightQ(priority);
+
+        // If it is the first process, set it to currentlyRunning.
+        if(currentlyRunning == null){
+            currentlyRunning = newProcess;
+        }
+        else{   // Otherwize, add it to the end of the queueue.
+            q.addLast(newProcess);
         }
         
-        dbMes("Added process " + up.getClass() + ". There are " + queue.size() + " processes in the queueue.");
+        dbMes("Added process " + up.getClass() + ". There are " + q.size() + " processes in the " + priority.toString() + " queueue.");
         
         sem.release();
 
-        return 0;
+        return newProcess.getPID();
     }
 
     /**
@@ -71,18 +99,13 @@ public class Scheduler{
         // Check if the currently Running process is still alive
         if (currentlyRunning.isDone() == false){   // If it is still running, move it to the end of the queueue.
             dbMes("Case: Still alive.");
-            queue.addLast(currentlyRunning);
-            currentlyRunning = queue.removeFirst();
+            getRightQ(currentlyRunning.getPriority()).addLast(currentlyRunning);
         }
         else{   // Otherwize, set the first item on the queue to be currently running.
             dbMes("Case: Someone died.");
-            if (queue.size() >= 0){ // Make sure there is something on the queue to run.
-                currentlyRunning = queue.removeFirst();
-                currentlyRunning.start();
-            }
-            else
-                dbMes("Queue is empty :/");
         }
+        
+        currentlyRunning = getNextQ().removeFirst();
 
         dbMes("currentlyRunning after switch: " + currentlyRunning.getClass());
 
@@ -93,7 +116,107 @@ public class Scheduler{
      * 
      */
     public void sleep(int miliseconds){
+
+        dbMes("Sleep");
+
+        currentlyRunning.stop();
+
+        SleepingProcess sp = new SleepingProcess(currentlyRunning, miliseconds);
+
+        if(sleeping.isEmpty()){
+            sleeping.add(sp);
+        }
+        else{
+            for(int i=0; i<sleeping.size(); i++){
+                if(sleeping.get(i).getWakeUpTime() < sp.getWakeUpTime()){
+                    sleeping.add(i+1, sp);
+                    break;
+                }
+            }
+        }
+
+        switchProcess();
+    }
+
+    /**
+     * Helper Method: Returns the queue that corresponds to the given Priority level.
+     * 
+     * @param priority The priority level of the desired queue
+     * @return The LinkedList that corresponds to the passed priority level
+     */
+    private LinkedList<PCB> getRightQ(OS.Priority priority){
+        if(priority == OS.Priority.REALTIME)
+            return realTimeQ;
+        else if (priority == OS.Priority.INTERACTIVE)
+            return interactiveQ;
+        else if (priority == OS.Priority.BACKGROUND){
+            return backgroundQ;
+        }
+        else{
+            dbMes("ERROR: Incorrect Priority");
+            return backgroundQ;
+        }
+    }
+
+    private LinkedList<PCB> getNextQ(){
+        int qSelection = 0;
+
+        dbMes("Next queueue");
+
+        if(realTimeQ.isEmpty() == false){
+            qSelection = rand.nextInt(10);
+        }
+        else if(interactiveQ.isEmpty() == false){
+            qSelection = rand.nextInt(4);
+        }
+        else
+            qSelection = rand.nextInt(1);
         
+        dbMes("Next Q " + qSelection);
+
+        if(qSelection >= 4){
+            dbMes("NextQ RealTime");
+            return realTimeQ;
+        }
+        else if(qSelection >=1){
+            dbMes("NextQ interactive");
+            return interactiveQ;
+        }
+        else{
+            dbMes("NextQ background");
+            return backgroundQ;
+        }
+    }
+
+    private class SleepingProcess{
+
+        private long wakeUpTime;
+        private PCB process;
+
+        SleepingProcess(PCB process, int miliseconds){
+            this.wakeUpTime = clock.millis() + miliseconds;
+            this.process = process;
+        }
+
+        public long getWakeUpTime(){
+            return wakeUpTime;
+        }
+
+        /**
+         * Returns the process to the right queue if it is time to wake up.
+         * 
+         * @return True if it woke up, false otherwize.
+         */
+        public boolean awaken(){
+            if (this.wakeUpTime < clock.millis()){
+                LinkedList<PCB> q = getRightQ(process.getPriority());
+
+                q.add(process);
+                return true;
+            }
+            else 
+                return false;
+        }
     }
 
     public void dbMes(String message){

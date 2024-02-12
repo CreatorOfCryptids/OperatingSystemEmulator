@@ -26,10 +26,10 @@ public class Kernel implements Runnable{
      * @param up The UserlandProcess to send to Scheduler.
      * @return The PID of the Process, or -1 for an error.
      */
-    private int createProcess(Object up){
+    private int createProcess(Object up, Object priority){
 
-        if (up instanceof UserLandProcess)
-            return scheduler.createProcess((UserLandProcess)up);
+        if (up instanceof UserLandProcess && priority instanceof OS.Priority)
+            return scheduler.createProcess((UserLandProcess)up, (OS.Priority) priority);
         else{
             dbMes("Object passed to Create Process was not a UserlandProcess");
             return -1;
@@ -52,7 +52,7 @@ public class Kernel implements Runnable{
             scheduler.sleep((int)miliseconds);
         }
         else{
-            dbMes("Object passed to sleep() was not an int.");
+            dbMes("ERROR: Object passed to sleep() was not an int.");
         }
     }
 
@@ -65,12 +65,10 @@ public class Kernel implements Runnable{
                 
             sem.acquireUninterruptibly();
 
-            //stopCurrentProcesss();
-
             switch (OS.currentCall){
                 case CREATE:
                     dbMes("Create Process");;
-                    OS.retval = this.createProcess(OS.parameters.get(0));
+                    OS.retval = this.createProcess(OS.parameters.get(0), OS.parameters.get(1));
                     break;
 
                 case SWITCH:

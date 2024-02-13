@@ -1,6 +1,13 @@
 public class NiceRealTime extends UserLandProcess{
     public void main(){
-        System.out.println("Nice :)");
-        OS.sleep(200);
+
+        while(true){
+            System.out.println("Nice :)");
+
+            cooperate();
+            
+            OS.sleep(200);
+        }
+        
     }
 }

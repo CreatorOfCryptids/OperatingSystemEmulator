@@ -35,14 +35,12 @@ public class OS {
 
         // Switch to Kernal
         switchToKernel();
-        int errors = 0;
         //*
         while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
             
             try{
                 return (int) retval;
             } catch (Exception e){
-                errors++;
             }
             //dbMes("ERROR: Cannot be cast :" + errors);
         }/**/

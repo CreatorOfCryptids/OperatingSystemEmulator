@@ -54,8 +54,9 @@ abstract class UserLandProcess implements Runnable{
      * Acquires (decriments) the semaphore, stoping this thread from running.
      */
     public void stop(){
-        sem.acquireUninterruptibly();
         dbMes("Stop, sem: " + (sem.availablePermits()));
+        sem.acquireUninterruptibly();
+        
     }
 
     /**

@@ -46,8 +46,10 @@ public class Scheduler{
             
             currentlyRunning.requestStop();
 
-            while(sleeping.isEmpty() == false && sleeping.getFirst().awaken())
+            while(sleeping.isEmpty() == false && sleeping.getFirst().awaken()){
                 sleeping.removeFirst();
+            }
+                
         }
     }
 
@@ -215,14 +217,18 @@ public class Scheduler{
                 LinkedList<PCB> q = getRightQ(process.getPriority());
 
                 q.add(process);
+
+                dbMes("Waking up " + process.toString());
+
                 return true;
             }
-            else 
+            else {
                 return false;
+            }   
         }
     }
 
     public void dbMes(String message){
-        OS.dbMes("SCHEDULER: " + message);
+        //OS.dbMes("SCHEDULER: " + message);
     }
 }

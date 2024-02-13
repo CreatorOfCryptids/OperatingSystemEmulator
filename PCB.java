@@ -21,6 +21,17 @@ public class PCB {
         dbMes("Request Stop");
 
         ulp.requestStop();
+
+        //*
+        while(ulp.isStopped() == false){
+            try{
+                Thread.sleep(10);
+            } catch (Exception e){
+                dbMes("ERROR: " + e.getMessage());
+            }
+        }
+        /**/
+
         timeOut();
     }
 
@@ -33,13 +44,13 @@ public class PCB {
 
         ulp.stop();
 
-        while(ulp.isStopped() == false){
+        /*while(ulp.isStopped() == false){
             try{
                 Thread.sleep(10);
             } catch (Exception e){
                 dbMes("ERROR: " + e.getMessage());
             }
-        }
+        }*/
     }
 
     /**

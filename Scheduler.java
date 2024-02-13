@@ -45,12 +45,11 @@ public class Scheduler{
             dbMes("Interupt.");
             if (currentlyRunning.isStopped()){
                 dbMes("CurrentlyRunning is not running.");
-                
             }
 
             currentlyRunning.requestStop();
 
-            if(sleeping.isEmpty() == false && sleeping.getFirst().awaken())
+            while(sleeping.isEmpty() == false && sleeping.getFirst().awaken())
                 sleeping.removeFirst();
         }
     }
@@ -119,8 +118,6 @@ public class Scheduler{
 
         dbMes("Sleep");
 
-        currentlyRunning.stop();
-
         SleepingProcess sp = new SleepingProcess(currentlyRunning, miliseconds);
 
         if(sleeping.isEmpty()){
@@ -172,7 +169,7 @@ public class Scheduler{
         else
             qSelection = rand.nextInt(1);
         
-        dbMes("Next Q " + qSelection);
+        dbMes("Next Q: " + qSelection);
 
         if(qSelection >= 4){
             dbMes("NextQ RealTime");
@@ -180,7 +177,12 @@ public class Scheduler{
         }
         else if(qSelection >=1){
             dbMes("NextQ interactive");
-            return interactiveQ;
+
+            // We only check if this is empty if realTime is also empty. Checking here for safety.
+            if (interactiveQ.isEmpty() == false)
+                return interactiveQ;
+            else
+                return backgroundQ;
         }
         else{
             dbMes("NextQ background");

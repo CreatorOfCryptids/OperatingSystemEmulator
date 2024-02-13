@@ -21,6 +21,7 @@ public class PCB {
         dbMes("Request Stop");
 
         ulp.requestStop();
+        timeOut();
     }
 
     /**
@@ -87,7 +88,7 @@ public class PCB {
     /**
      * Marks that this process has timed out, and decreases priority if necessary.
      */
-    public void isTimedOut(){
+    public void timeOut(){
 
         timeouts++;
 
@@ -97,7 +98,7 @@ public class PCB {
             else if(this.priority == OS.Priority.INTERACTIVE)
                 priority = OS.Priority.BACKGROUND;
 
-            dbMes("Timed out. New priority: " + this.priority.toString());
+            dbMes(ulp.getClass() + " timed out. New priority: " + this.priority.toString());
             
             timeouts = 0;
         }

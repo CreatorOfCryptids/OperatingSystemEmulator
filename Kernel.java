@@ -48,6 +48,7 @@ public class Kernel implements Runnable{
      * 
      */
     private void sleep(Object miliseconds){
+
         if (miliseconds instanceof Integer){
             scheduler.sleep((int)miliseconds);
         }
@@ -77,6 +78,7 @@ public class Kernel implements Runnable{
                     break;
 
                 case SLEEP:
+                    dbMes("Sleep");
                     sleep(OS.parameters.get(0));
                     break;
                 
@@ -84,7 +86,7 @@ public class Kernel implements Runnable{
                     dbMes("Unknown Current Call.");
             }
             
-            dbMes("Resuming currentProcess: " + scheduler.currentlyRunning.getClass());
+            dbMes("Resuming currentProcess: " + scheduler.currentlyRunning.toString());
             scheduler.currentlyRunning.start();
         }
     }
@@ -105,6 +107,6 @@ public class Kernel implements Runnable{
     }
 
     private void dbMes(String message){
-        OS.dbMes("KERNEL: " + message);
+        //OS.dbMes("KERNEL: " + message);
     }
 }

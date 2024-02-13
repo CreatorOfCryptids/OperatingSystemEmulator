@@ -43,10 +43,7 @@ public class Scheduler{
     private class Interupt extends TimerTask{
         public void run(){
             dbMes("Interupt.");
-            if (currentlyRunning.isStopped()){
-                dbMes("CurrentlyRunning is not running.");
-            }
-
+            
             currentlyRunning.requestStop();
 
             while(sleeping.isEmpty() == false && sleeping.getFirst().awaken())
@@ -93,7 +90,7 @@ public class Scheduler{
 
         sem.acquireUninterruptibly();
         dbMes("Switching Process.");
-        dbMes("currentlyRunning before switch: " + currentlyRunning.getClass());
+        dbMes("currentlyRunning before switch: " + currentlyRunning.toString());
 
         // Check if the currently Running process is still alive
         if (currentlyRunning.isDone() == false){   // If it is still running, move it to the end of the queueue.
@@ -106,7 +103,7 @@ public class Scheduler{
         
         currentlyRunning = getNextQ().removeFirst();
 
-        dbMes("currentlyRunning after switch: " + currentlyRunning.getClass());
+        dbMes("currentlyRunning after switch: " + currentlyRunning.toString());
 
         sem.release();
     }
@@ -131,6 +128,8 @@ public class Scheduler{
                 }
             }
         }
+
+        dbMes("Sleeping has " + sleeping.size() + " members in the queue");
 
         switchProcess();
     }
@@ -158,8 +157,6 @@ public class Scheduler{
     private LinkedList<PCB> getNextQ(){
         int qSelection = 0;
 
-        dbMes("Next queueue");
-
         if(realTimeQ.isEmpty() == false){
             qSelection = rand.nextInt(10);
         }
@@ -176,13 +173,17 @@ public class Scheduler{
             return realTimeQ;
         }
         else if(qSelection >=1){
-            dbMes("NextQ interactive");
 
             // We only check if this is empty if realTime is also empty. Checking here for safety.
-            if (interactiveQ.isEmpty() == false)
+            if (interactiveQ.isEmpty() == false){
+                dbMes("NextQ interactive");
                 return interactiveQ;
-            else
+            }
+            else{
+                dbMes("NextQ background");
                 return backgroundQ;
+            }
+                
         }
         else{
             dbMes("NextQ background");

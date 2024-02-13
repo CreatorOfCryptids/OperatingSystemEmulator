@@ -6,7 +6,7 @@ public class HelloWorld extends UserLandProcess{
 
                 // Chill pill
                 try {
-                    Thread.sleep(20);
+                    Thread.sleep(40);
                 }
                 catch (Exception e) {}
                 

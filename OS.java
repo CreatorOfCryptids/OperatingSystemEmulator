@@ -44,7 +44,7 @@ public class OS {
             } catch (Exception e){
                 errors++;
             }
-            dbMes("ERROR: Cannot be cast :" + errors);
+            //dbMes("ERROR: Cannot be cast :" + errors);
         }/**/
     }
 

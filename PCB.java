@@ -32,6 +32,7 @@ public class PCB {
         dbMes("Stop");
 
         ulp.stop();
+
         while(ulp.isStopped() == false){
             try{
                 Thread.sleep(10);
@@ -62,7 +63,7 @@ public class PCB {
      */
     public void start() {
 
-        dbMes("Start");
+        dbMes("Start.");
 
         ulp.start();
     }
@@ -91,6 +92,7 @@ public class PCB {
     public void timeOut(){
 
         timeouts++;
+        dbMes("Timed out " + timeouts);
 
         if(timeouts >=5){
             if(this.priority == OS.Priority.REALTIME)
@@ -98,13 +100,22 @@ public class PCB {
             else if(this.priority == OS.Priority.INTERACTIVE)
                 priority = OS.Priority.BACKGROUND;
 
-            dbMes(ulp.getClass() + " timed out. New priority: " + this.priority.toString());
+            dbMes("Demoted. New priority: " + this.priority.toString());
             
             timeouts = 0;
         }
     }
 
+    /**
+     * DEBUGGING HELP!
+     * 
+     * @return A String containing the name of the ULP.
+     */
+    public String toString(){
+        return "PCB: " + ulp.getClass();
+    }
+
     private void dbMes(String Message){
-        OS.dbMes("PCB: " + Message);
+        OS.dbMes("PCB (" + ulp.getClass() + "): " + Message);
     }
 }

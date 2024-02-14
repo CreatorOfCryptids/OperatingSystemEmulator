@@ -6,6 +6,9 @@ abstract class UserLandProcess implements Runnable{
     private Semaphore sem;
     private boolean isExpired;
 
+    /**
+     * Constructor.
+     */
     UserLandProcess(){
         thread = new Thread(this);
         sem = new Semaphore(0);
@@ -66,6 +69,7 @@ abstract class UserLandProcess implements Runnable{
         dbMes("Run");
         sem.acquireUninterruptibly();
         main();
+        return;
     }
 
     /**
@@ -80,6 +84,11 @@ abstract class UserLandProcess implements Runnable{
         }
     }
 
+    /**
+     * DEBUGGING HELPER!!!
+     * 
+     * @param message The debugging message.
+     */
     private void dbMes(String message){
         OS.dbMes("USERLAND_PROCESS (" + this.getClass() + "): " + message);
     }

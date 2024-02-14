@@ -38,7 +38,7 @@ public class Scheduler{
     }
 
     /**
-     * Packages the process into a timerTask.
+     * Packages the Interrupt into a timerTask.
      */
     private class Interupt extends TimerTask{
         public void run(){
@@ -55,6 +55,7 @@ public class Scheduler{
 
     /**
      * Adds a kernelland process to the queueue.
+     * 
      * @param up The userland process to be added.
      * @return The PID of the added process.
      */
@@ -65,20 +66,18 @@ public class Scheduler{
         // Check if the process exists, if it doesn't return an error.
         if(up == null)
             return -1;
-
+        
         PCB newProcess = new PCB(up, priority);
-
-        LinkedList<PCB> q = getRightQ(priority);
 
         // If it is the first process, set it to currentlyRunning.
         if(currentlyRunning == null){
             currentlyRunning = newProcess;
         }
         else{   // Otherwize, add it to the end of the queueue.
-            q.addLast(newProcess);
+            getRightQ(priority).addLast(newProcess);
         }
         
-        dbMes("Added process " + up.getClass() + ". There are " + q.size() + " processes in the " + priority.toString() + " queueue.");
+        dbMes("Added process " + up.getClass() + ". There are " + getRightQ(priority).size() + " processes in the " + priority.toString() + " queueue.");
         
         sem.release();
 
@@ -91,18 +90,20 @@ public class Scheduler{
     public void switchProcess(){
 
         sem.acquireUninterruptibly();
+
         dbMes("Switching Process.");
         dbMes("currentlyRunning before switch: " + currentlyRunning.toString());
 
         // Check if the currently Running process is still alive
-        if (currentlyRunning.isDone() == false){   // If it is still running, move it to the end of the queueue.
+        if (currentlyRunning.isDone() == false){   // If it is still running, move it to the end of the correct queueue.
             dbMes("Case: Still alive.");
             getRightQ(currentlyRunning.getPriority()).addLast(currentlyRunning);
         }
-        else{   // Otherwize, set the first item on the queue to be currently running.
+        else{
             dbMes("Case: Someone died.");
         }
         
+        // Get the next process in the queue and set it to currently running.
         currentlyRunning = getNextQ().removeFirst();
 
         dbMes("currentlyRunning after switch: " + currentlyRunning.toString());
@@ -111,7 +112,11 @@ public class Scheduler{
     }
 
     /**
+     * Puts the currently running process into the sleep queue in the right location. Does this 
+     * by wrapping the process in a SleepingProcess object that stores how when it should be 
+     * woken up.
      * 
+     * @param miliseconds The amount of time that should pass before the process is woken up.
      */
     public void sleep(int miliseconds){
 
@@ -156,6 +161,11 @@ public class Scheduler{
         }
     }
 
+    /**
+     * Randomly chooses which queue should be ran next.
+     * 
+     * @return The queue that was randomly selected.
+     */
     private LinkedList<PCB> getNextQ(){
         int qSelection = 0;
 
@@ -193,16 +203,30 @@ public class Scheduler{
         }
     }
 
+    /**
+     * A helper class that helps to keep sleeping processes organized.
+     */
     private class SleepingProcess{
 
-        private long wakeUpTime;
-        private PCB process;
+        private long wakeUpTime;    // When the process should be woken up
+        private PCB process;        // The process that is being put to sleep.
 
+        /**
+         * Constructor.
+         * 
+         * @param process The process that is being put to sleep.
+         * @param miliseconds How long before it should be woken up.
+         */
         SleepingProcess(PCB process, int miliseconds){
             this.wakeUpTime = clock.millis() + miliseconds;
             this.process = process;
         }
 
+        /**
+         * Accesses the time that this process should be woken up.
+         * 
+         * @return The time that the process should be woken up.
+         */
         public long getWakeUpTime(){
             return wakeUpTime;
         }
@@ -228,6 +252,11 @@ public class Scheduler{
         }
     }
 
+    /**
+     * DEBUGGING HELPER!!!
+     * 
+     * @param message The debug message.
+     */
     public void dbMes(String message){
         //OS.dbMes("SCHEDULER: " + message);
     }

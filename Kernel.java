@@ -6,6 +6,9 @@ public class Kernel implements Runnable{
     private Thread thread;
     private Semaphore sem;
 
+    /**
+     * Constructor.
+     */
     Kernel(){
         scheduler = new Scheduler();
         thread = new Thread(this);
@@ -23,6 +26,7 @@ public class Kernel implements Runnable{
 
     /**
      * Takes an object. Makes sure that it is a UserlandProcess, then passes it to Scheduler.
+     * 
      * @param up The UserlandProcess to send to Scheduler.
      * @return The PID of the Process, or -1 for an error.
      */
@@ -38,14 +42,16 @@ public class Kernel implements Runnable{
     }
 
     /**
-     * 
+     * Switches the currentlyRunning process out for the next process in the queue.
      */
     private void switchProcess(){
         scheduler.switchProcess();
     }
 
     /**
+     * Puts the currently running process to sleep.
      * 
+     * @param miliseconds The amount of time the process will be asleep for.
      */
     private void sleep(Object miliseconds){
 
@@ -106,7 +112,12 @@ public class Kernel implements Runnable{
             
     }
 
+    /**
+     * DEBUGGING HELPER!!!
+     * 
+     * @param message The debug message.
+     */
     private void dbMes(String message){
-        //OS.dbMes("KERNEL: " + message);
+        OS.dbMes("KERNEL: " + message);
     }
 }

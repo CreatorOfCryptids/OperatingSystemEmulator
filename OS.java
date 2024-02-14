@@ -46,6 +46,13 @@ public class OS {
         }/**/
     }
 
+    /**
+     * Adds a process to the scheduler.
+     * 
+     * @param up The process to be added.
+     * @param priority The priority of the new process.
+     * @return The PID of the new Process.
+     */
     public static int createProcess(UserLandProcess up, Priority priority){
 
         dbMes("OS: Creating new Process: " + up.getClass() + " Priority: " + priority.toString());
@@ -97,6 +104,11 @@ public class OS {
         switchToKernel();
     }
 
+    /**
+     * Pauses the currentlyRunning process and doesn't put it back in the queue unitl after the specified time has elapsed.
+     * 
+     * @param milliseconds The amount of time that the process wants to sleep for.
+     */
     public static void sleep(int milliseconds){
 
         dbMes("OS: Sleep");

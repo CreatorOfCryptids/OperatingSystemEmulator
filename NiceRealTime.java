@@ -1,6 +1,5 @@
 public class NiceRealTime extends UserLandProcess{
     public void main(){
-
         while(true){
             System.out.println("Nice :)");
 
@@ -8,6 +7,5 @@ public class NiceRealTime extends UserLandProcess{
             
             OS.sleep(200);
         }
-        
     }
 }

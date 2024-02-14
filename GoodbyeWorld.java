@@ -1,5 +1,4 @@
 public class GoodbyeWorld extends UserLandProcess{
-
     public void main() {
         while(true){
             for(int i = 0; i<5; i++){

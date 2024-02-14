@@ -22,17 +22,7 @@ public class PCB {
 
         ulp.requestStop();
 
-        //*
-        while(ulp.isStopped() == false){
-            try{
-                Thread.sleep(10);
-            } catch (Exception e){
-                dbMes("ERROR: " + e.getMessage());
-            }
-        }
-        /**/
-
-        timeOut();
+        timeOut();  // If if hasn't put itself to sleep before the interrupt then it has been timed out.
     }
 
     /**
@@ -43,18 +33,11 @@ public class PCB {
         dbMes("Stop");
 
         ulp.stop();
-
-        /*while(ulp.isStopped() == false){
-            try{
-                Thread.sleep(10);
-            } catch (Exception e){
-                dbMes("ERROR: " + e.getMessage());
-            }
-        }*/
     }
 
     /**
      * Checks if the process is done running
+     * 
      * @return True if the process is done running, false otherwize.
      */
     public boolean isDone(){
@@ -63,6 +46,7 @@ public class PCB {
 
     /**
      * Checks if the proess is stopped.
+     * 
      * @return True if the process is stopped, false otherwize.
      */
     public boolean isStopped(){
@@ -118,7 +102,7 @@ public class PCB {
     }
 
     /**
-     * DEBUGGING HELP!
+     * DEBUGGING HELPER!
      * 
      * @return A String containing the name of the ULP.
      */
@@ -126,6 +110,11 @@ public class PCB {
         return "PCB: " + ulp.getClass();
     }
 
+    /**
+     * DEBUGGING HELPER!
+     * 
+     * @param Message
+     */
     private void dbMes(String Message){
         OS.dbMes("PCB (" + ulp.getClass() + "): " + Message);
     }

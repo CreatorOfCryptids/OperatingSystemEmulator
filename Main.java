@@ -7,5 +7,7 @@ public class Main {
         OS.createProcess(new Insomniac(), OS.Priority.REALTIME);
 
         OS.createProcess(new NiceRealTime(), OS.Priority.REALTIME);
+
+        OS.createProcess(new Background(), OS.Priority.BACKGROUND);
     }
 }

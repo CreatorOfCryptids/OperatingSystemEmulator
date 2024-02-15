@@ -2,17 +2,19 @@ import java.util.concurrent.Semaphore;
 
 public class Kernel implements Runnable{
 
-    private Scheduler scheduler;
     private Thread thread;
     private Semaphore sem;
+    private Scheduler scheduler;
+    private VFS vfs;
 
     /**
      * Constructor.
      */
     Kernel(){
-        scheduler = new Scheduler();
         thread = new Thread(this);
         sem = new Semaphore(0);
+        scheduler = new Scheduler();
+        vfs = new VFS();
         
         thread.start();
     }
@@ -30,13 +32,13 @@ public class Kernel implements Runnable{
      * @param up The UserlandProcess to send to Scheduler.
      * @return The PID of the Process, or -1 for an error.
      */
-    private int createProcess(Object up, Object priority){
+    private void createProcess(Object up, Object priority){
 
         if (up instanceof UserLandProcess && priority instanceof OS.Priority)
-            return scheduler.createProcess((UserLandProcess)up, (OS.Priority) priority);
+            OS.retval = scheduler.createProcess((UserLandProcess)up, (OS.Priority) priority);
         else{
-            dbMes("Object passed to Create Process was not a UserlandProcess");
-            return -1;
+            dbMes("Object passed to kernel.createProcess() was not a UserlandProcess");
+            OS.retval = -1;
         }
 
     }
@@ -64,18 +66,31 @@ public class Kernel implements Runnable{
     }
 
     /**
+     * Opens the desired device.
+     * 
+     * @param device A string corresponding to the desired device.
+     */
+    private void open(Object device){
+        if (device instanceof String)
+            OS.retval = vfs.open((String) device);
+        else{
+            dbMes("Object passed to kernel.open() was not a string");
+            OS.retval = -1;
+        }
+    }
+    /**
      * Runs the Call left by the OS.
      */
     public void run(){
 
         while(true){
-                
+            
             sem.acquireUninterruptibly();
 
             switch (OS.currentCall){
                 case CREATE:
                     dbMes("Create Process");;
-                    OS.retval = this.createProcess(OS.parameters.get(0), OS.parameters.get(1));
+                    createProcess(OS.parameters.get(0), OS.parameters.get(1));
                     break;
 
                 case SWITCH:
@@ -86,6 +101,11 @@ public class Kernel implements Runnable{
                 case SLEEP:
                     dbMes("Sleep");
                     sleep(OS.parameters.get(0));
+                    break;
+
+                case OPEN:
+                    dbMes("Open");
+                    open(OS.parameters.get(0));
                     break;
                 
                 default:

@@ -74,10 +74,10 @@ public class Scheduler{
             currentlyRunning = newProcess;
         }
         else{   // Otherwize, add it to the end of the queueue.
-            getRightQ(priority).addLast(newProcess);
+            getCorrespondingQueue(priority).addLast(newProcess);
         }
         
-        dbMes("Added process " + up.getClass() + ". There are " + getRightQ(priority).size() + " processes in the " + priority.toString() + " queueue.");
+        dbMes("Added process " + up.getClass() + ". There are " + getCorrespondingQueue(priority).size() + " processes in the " + priority.toString() + " queueue.");
         
         sem.release();
 
@@ -97,14 +97,14 @@ public class Scheduler{
         // Check if the currently Running process is still alive
         if (currentlyRunning.isDone() == false){   // If it is still running, move it to the end of the correct queueue.
             dbMes("Case: Still alive.");
-            getRightQ(currentlyRunning.getPriority()).addLast(currentlyRunning);
+            getCorrespondingQueue(currentlyRunning.getPriority()).addLast(currentlyRunning);
         }
         else{
             dbMes("Case: Someone died.");
         }
         
         // Get the next process in the queue and set it to currently running.
-        currentlyRunning = getNextQ().removeFirst();
+        currentlyRunning = getRandomQueue().removeFirst();
 
         dbMes("currentlyRunning after switch: " + currentlyRunning.toString());
 
@@ -147,7 +147,7 @@ public class Scheduler{
      * @param priority The priority level of the desired queue
      * @return The LinkedList that corresponds to the passed priority level
      */
-    private LinkedList<PCB> getRightQ(OS.Priority priority){
+    private LinkedList<PCB> getCorrespondingQueue(OS.Priority priority){
         if(priority == OS.Priority.REALTIME)
             return realTimeQ;
         else if (priority == OS.Priority.INTERACTIVE)
@@ -166,7 +166,7 @@ public class Scheduler{
      * 
      * @return The queue that was randomly selected.
      */
-    private LinkedList<PCB> getNextQ(){
+    private LinkedList<PCB> getRandomQueue(){
         int qSelection = 0;
 
         if(realTimeQ.isEmpty() == false){
@@ -185,7 +185,6 @@ public class Scheduler{
             return realTimeQ;
         }
         else if(qSelection >=1){
-
             // We only check if this is empty if realTime is also empty. Checking here for safety.
             if (interactiveQ.isEmpty() == false){
                 dbMes("NextQ interactive");
@@ -194,8 +193,7 @@ public class Scheduler{
             else{
                 dbMes("NextQ background");
                 return backgroundQ;
-            }
-                
+            } 
         }
         else{
             dbMes("NextQ background");
@@ -238,7 +236,7 @@ public class Scheduler{
          */
         public boolean awaken(){
             if (this.wakeUpTime < clock.millis()){
-                LinkedList<PCB> q = getRightQ(process.getPriority());
+                LinkedList<PCB> q = getCorrespondingQueue(process.getPriority());
 
                 q.add(process);
 

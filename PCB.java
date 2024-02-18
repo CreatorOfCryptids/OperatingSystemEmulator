@@ -101,6 +101,10 @@ public class PCB {
         }
     }
 
+    public void timeOutReset(){
+        timeouts = 0;
+    }
+
     /**
      * DEBUGGING HELPER!
      * 

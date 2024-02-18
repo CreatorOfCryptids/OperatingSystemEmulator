@@ -47,6 +47,7 @@ public class Scheduler{
             currentlyRunning.requestStop();
 
             while(sleeping.isEmpty() == false && sleeping.getFirst().awaken()){
+                dbMes(sleeping.toString());
                 sleeping.removeFirst();
             }
                 
@@ -121,6 +122,7 @@ public class Scheduler{
     public void sleep(int miliseconds){
 
         dbMes("Sleep");
+        currentlyRunning.timeOutReset();
 
         SleepingProcess sp = new SleepingProcess(currentlyRunning, miliseconds);
 
@@ -138,7 +140,7 @@ public class Scheduler{
 
         dbMes("Sleeping has " + sleeping.size() + " members in the queue");
 
-        switchProcess();
+        currentlyRunning = getRandomQueue().removeFirst();
     }
 
     /**
@@ -248,6 +250,10 @@ public class Scheduler{
                 return false;
             }   
         }
+
+        public String toString(){
+            return "Sleepy " + process.toString();
+        }
     }
 
     /**
@@ -256,6 +262,6 @@ public class Scheduler{
      * @param message The debug message.
      */
     public void dbMes(String message){
-        //OS.dbMes("SCHEDULER: " + message);
+        OS.dbMes("SCHEDULER: " + message);
     }
 }

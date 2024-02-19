@@ -1,6 +1,6 @@
 import java.util.concurrent.Semaphore;
 
-public class Kernel implements Runnable{
+public class Kernel implements Runnable, Device{
 
     private Thread thread;
     private Semaphore sem;
@@ -139,5 +139,25 @@ public class Kernel implements Runnable{
      */
     private void dbMes(String message){
         OS.dbMes("KERNEL: " + message);
+    }
+
+    public int open(String s) {
+        
+    }
+
+    public void close(int id) {
+        
+    }
+
+    public byte[] read(int id, int size) {
+        
+    }
+
+    public void seek(int id, int to) {
+        
+    }
+
+    public int write(int id, byte[] data) {
+        
     }
 }

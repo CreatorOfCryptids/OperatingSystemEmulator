@@ -132,15 +132,6 @@ public class Kernel implements Runnable, Device{
             
     }
 
-    /**
-     * DEBUGGING HELPER!!!
-     * 
-     * @param message The debug message.
-     */
-    private void dbMes(String message){
-        OS.dbMes("KERNEL: " + message);
-    }
-
     public int open(String s) {
         
     }
@@ -159,5 +150,14 @@ public class Kernel implements Runnable, Device{
 
     public int write(int id, byte[] data) {
         
+    }
+    
+    /**
+     * DEBUGGING HELPER!!!
+     * 
+     * @param message The debug message.
+     */
+    private void dbMes(String message){
+        OS.dbMes("KERNEL: " + message);
     }
 }

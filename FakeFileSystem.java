@@ -5,7 +5,11 @@ import java.io.RandomAccessFile;
 public class FakeFileSystem implements Device{
 
     private final int MAX_FILES = 10;
-    private RandomAccessFile files[] = new RandomAccessFile[MAX_FILES];
+    private RandomAccessFile files[];
+
+    FakeFileSystem(){
+        files = new RandomAccessFile[MAX_FILES];
+    }
 
     public int open(String s) {
         int fid=-1;

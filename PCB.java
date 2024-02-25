@@ -1,16 +1,18 @@
-public class PCB {
+public class PCB implements Device{
     
     private static int nextPID = 0;
     private int pid;
     private UserLandProcess ulp;
     private OS.Priority priority;
     private int timeouts;
+    private int[] deviceIDs;
 
     public PCB(UserLandProcess up, OS.Priority priority){
         this.ulp = up;
         this.pid = nextPID++;
         this.priority = priority;
         this.timeouts = 0;
+        this.deviceIDs = new int [10];
     }
 
     /**
@@ -101,8 +103,31 @@ public class PCB {
         }
     }
 
+    /**
+     * Resets the timeout count so that the process is not unfairly demoted.
+     */
     public void timeOutReset(){
         timeouts = 0;
+    }
+
+    public int open(String s) {
+
+    }
+
+    public void close(int id) {
+        
+    }
+
+    public byte[] read(int id, int size) {
+        
+    }
+
+    public void seek(int id, int to) {
+        
+    }
+
+    public int write(int id, byte[] data) {
+        
     }
 
     /**

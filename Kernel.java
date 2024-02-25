@@ -1,6 +1,6 @@
 import java.util.concurrent.Semaphore;
 
-public class Kernel implements Runnable, Device{
+public class Kernel implements Runnable{
 
     private Thread thread;
     private Semaphore sem;
@@ -107,13 +107,17 @@ public class Kernel implements Runnable, Device{
                     dbMes("Open");
                     open(OS.parameters.get(0));
                     break;
+
+                case CLOSE:
+                    dbMes("Close");
+                    close();
                 
                 default:
-                    dbMes("Unknown Current Call.");
+                    dbMes("Unknown Current Call: " + OS.currentCall);
             }
             
-            dbMes("Resuming currentProcess: " + scheduler.currentlyRunning.toString());
-            scheduler.currentlyRunning.start();
+            dbMes("Resuming currentProcess: " + scheduler.getCurrentlyRunning().toString());
+            scheduler.getCurrentlyRunning().start();
         }
     }
 
@@ -122,9 +126,9 @@ public class Kernel implements Runnable, Device{
      */
     public void stopCurrentProcesss() {
 
-        if (scheduler.currentlyRunning != null){
-            dbMes("Stopping: " + scheduler.currentlyRunning.getClass());
-            scheduler.currentlyRunning.stop();
+        if (scheduler.getCurrentlyRunning() != null){
+            dbMes("Stopping: " + scheduler.getCurrentlyRunning().getClass());
+            scheduler.getCurrentlyRunning().stop();
         }
         else{
             dbMes("Current Process is null");
@@ -132,15 +136,19 @@ public class Kernel implements Runnable, Device{
             
     }
 
-    public int open(String s) {
-        
+    public void open(Object s) {
+        if (s instanceof String){
+
+        }
+        else
+            return -1;  // TODO: how do this again?
     }
 
     public void close(int id) {
         
     }
 
-    public byte[] read(int id, int size) {
+    public void read(int id, int size) {
         
     }
 
@@ -148,7 +156,7 @@ public class Kernel implements Runnable, Device{
         
     }
 
-    public int write(int id, byte[] data) {
+    public void write(int id, byte[] data) {
         
     }
     

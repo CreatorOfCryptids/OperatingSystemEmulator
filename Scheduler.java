@@ -17,7 +17,7 @@ public class Scheduler{
     private Random rand;
     private Semaphore sem;                          // The semaphore that makes sure that the threads don't overlap with eachother.
     private Timer timer;                            // Schedules an interrupt for every 250 ms
-    public PCB currentlyRunning;                    // The process that is currently running.
+    private PCB currentlyRunning;                    // The process that is currently running.
 
     /**
      * Constructor.
@@ -201,6 +201,10 @@ public class Scheduler{
             dbMes("NextQ background");
             return backgroundQ;
         }
+    }
+
+    public PCB getCurrentlyRunning(){
+        return currentlyRunning;
     }
 
     /**

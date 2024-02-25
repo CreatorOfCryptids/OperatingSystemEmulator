@@ -3,7 +3,11 @@ import java.util.Random;
 public class RandomDevice implements Device{
 
     private static final int RAND_COUNT = 10;
-    private Random[] rands = new Random[RAND_COUNT];
+    private Random[] rands;
+
+    RandomDevice(){
+        rands = new Random[RAND_COUNT];
+    }
 
     /**
      * Creates a new random device.

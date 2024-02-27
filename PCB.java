@@ -1,12 +1,18 @@
 public class PCB{
     
-    private static int nextPID = 0;
-    private int pid;
-    private UserLandProcess ulp;
-    private OS.Priority priority;
-    private int timeouts;
-    private int[] deviceIDs;
+    private static int nextPID = 0; // Stores the number of PCBs.
+    private int pid;                // This PCB's PID.
+    private UserLandProcess ulp;    // The ULP under this PCB's control
+    private OS.Priority priority;   // The ULP's priority.
+    private int timeouts;           // The number of times that this ULP has gone to timeout.
+    private int[] deviceIDs;        // The index of differnt Devices that this ULP has access to.
 
+    /**
+     * Constructor
+     * 
+     * @param up The ULP to be managed.
+     * @param priority The ULP's priority.
+     */
     public PCB(UserLandProcess up, OS.Priority priority){
         this.ulp = up;
 
@@ -160,7 +166,11 @@ public class PCB{
         return retval;
     }
 
-    
+    /**
+     * Returns the IDs of the process.
+     * 
+     * @return An array of FIDs.
+     */
     public int[] getDeviceIDs(){
         return deviceIDs;
     }

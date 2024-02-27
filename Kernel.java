@@ -11,7 +11,7 @@ public class Kernel implements Runnable{
      * Constructor.
      */
     Kernel(){
-        thread = new Thread(this);
+        thread = new Thread(this, "Kernel");
         sem = new Semaphore(0);
         scheduler = new Scheduler(this);
         vfs = new VFS();
@@ -29,7 +29,7 @@ public class Kernel implements Runnable{
     }
 
     /**
-     * Runs the Call left by the OS.
+     * The functionality inside the Kernel's Thread.
      */
     public void run(){
 
@@ -89,7 +89,6 @@ public class Kernel implements Runnable{
     }
 
     // Call Methods:
-        // Process Management:
 
     /**
      * Takes an object. Makes sure that it is a UserlandProcess, then passes it to Scheduler.

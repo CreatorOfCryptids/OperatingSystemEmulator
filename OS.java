@@ -2,10 +2,10 @@ import java.util.ArrayList;
 
 public class OS {
     
-    private static Kernel kernel;
-    public static CallType currentCall;
-    public static ArrayList<Object> parameters;
-    public static Object retval;
+    private static Kernel kernel;               // A reference to the Kernel.
+    public static CallType currentCall;         // The current call to the Kernel.
+    public static ArrayList<Object> parameters; // The Parameters for the Kernel Call.
+    public static Object retval;                // The return value from the Kernel.
 
     public enum CallType{
         CLOSE, CREATE, OPEN, READ, SEEK, SLEEP, SWITCH, WRITE
@@ -15,21 +15,26 @@ public class OS {
         REALTIME, INTERACTIVE, BACKGROUND
     }
 
+    // Init Methods:
+
     /**
-     * Closes the device specified by the FID.
+     * Starts the initial process of the OS.
      * 
-     * @param FID The File ID of the device to be closed.
+     * @param init The first process to run.
      */
-    public static void close(int FID){
-        OS.dbMes("OS: Closing " + FID);
+    public static void startUp(UserLandProcess init){
+        
+        dbMes("OS: StartUp");
 
-        parameters.clear();
-        parameters.add(FID);
+        kernel = new Kernel();
+        parameters = new ArrayList<Object>();
+        retval = new Object();
 
-        currentCall = CallType.CLOSE;
-
-        switchToKernel();
+        createProcess(init);
+        createProcess(new IdleProcess(), Priority.BACKGROUND);
     }
+
+    // Kernel Calls:
 
     /**
      * Adds a process to the scheduler.
@@ -91,6 +96,39 @@ public class OS {
                 } catch(Exception ex){}
             }
         }
+    }
+
+    /**
+     * Switches to the next process in the queue.
+     */
+    public static void switchProcess(){
+        dbMes("OS: Switching process");
+
+        retval = null;
+        parameters.clear();
+
+        currentCall = CallType.SWITCH;
+
+        switchToKernel();
+    }
+
+    /**
+     * Pauses the currentlyRunning process and doesn't put it back in the queue unitl after the specified time has elapsed.
+     * 
+     * @param milliseconds The amount of time that the process wants to sleep for.
+     */
+    public static void sleep(int milliseconds){
+
+        dbMes("OS: Sleep");
+
+        retval = null;
+        parameters.clear();
+
+        parameters.add(milliseconds);
+        
+        currentCall = CallType.SLEEP;
+
+        switchToKernel();
     }
 
     /**
@@ -180,68 +218,7 @@ public class OS {
     }
 
     /**
-     * Pauses the currentlyRunning process and doesn't put it back in the queue unitl after the specified time has elapsed.
-     * 
-     * @param milliseconds The amount of time that the process wants to sleep for.
-     */
-    public static void sleep(int milliseconds){
-
-        dbMes("OS: Sleep");
-
-        retval = null;
-        parameters.clear();
-
-        parameters.add(milliseconds);
-        
-        currentCall = CallType.SLEEP;
-
-        switchToKernel();
-    }
-
-    /**
-     * Starts the initial process of the OS.
-     * 
-     * @param init The first process to run.
-     */
-    public static void startUp(UserLandProcess init){
-        
-        dbMes("OS: StartUp");
-
-        kernel = new Kernel();
-        parameters = new ArrayList<Object>();
-        retval = new Object();
-
-        createProcess(init);
-        createProcess(new IdleProcess(), Priority.BACKGROUND);
-    }
-
-    /**
-     * Switches to the next process in the queue.
-     */
-    public static void switchProcess(){
-        dbMes("OS: Switching process");
-
-        retval = null;
-        parameters.clear();
-
-        currentCall = CallType.SWITCH;
-
-        switchToKernel();
-    }
-        
-    /**
-     * Starts the Kernel and stops the current process.
-     */
-    private static void switchToKernel(){
-        dbMes("OS: Switching to kernel");
-
-        kernel.start();
-
-        kernel.stopCurrentProcesss();
-    }
-
-    /**
-     * Writed information to the specifed device.
+     * Writes information to the specifed device.
      * 
      * @param FID The File ID of the device being writen to.
      * @param data The data passed to the device.
@@ -268,7 +245,38 @@ public class OS {
             }
         }
     }
+
+    /**
+     * Closes the device specified by the FID.
+     * 
+     * @param FID The File ID of the device to be closed.
+     */
+    public static void close(int FID){
+        OS.dbMes("OS: Closing " + FID);
+
+        parameters.clear();
+        parameters.add(FID);
+
+        currentCall = CallType.CLOSE;
+
+        switchToKernel();
+    }
+
+    // Helper Methods:
+
+    /**
+     * Starts the Kernel and stops the current process.
+     */
+    private static void switchToKernel(){
+        dbMes("OS: Switching to kernel");
+
+        kernel.start();
+
+        kernel.stopCurrentProcesss();
+    }
     
+    // Debugging Help:
+
     /**
      * EXTRA METHOD!!! Prints a message to the terminal to help bebugging.
      * 

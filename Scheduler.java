@@ -59,6 +59,8 @@ public class Scheduler{
         }
     }
 
+    // Scheduler Functionality:
+
     /**
      * Adds a kernelland process to the queueue.
      * 
@@ -154,6 +156,19 @@ public class Scheduler{
         currentlyRunning = getRandomQueue().removeFirst();
     }
 
+    // Accessors:
+
+    /**
+     * The getCurrentlyRunning() accessor.
+     * 
+     * @return The currentlyRunning process's PCB.
+     */
+    public PCB getCurrentlyRunning(){
+        return currentlyRunning;
+    }
+
+    // Helper Methods:
+
     /**
      * Returns the queue that corresponds to the given Priority level.
      * 
@@ -215,15 +230,6 @@ public class Scheduler{
     }
 
     /**
-     * The getCurrentlyRunning() accessor.
-     * 
-     * @return The currentlyRunning process's PCB.
-     */
-    public PCB getCurrentlyRunning(){
-        return currentlyRunning;
-    }
-
-    /**
      * A helper class that helps to keep sleeping processes organized.
      */
     private class SleepingProcess{
@@ -275,6 +281,8 @@ public class Scheduler{
             return "Sleepy " + process.toString();
         }
     }
+
+    // Debugging Helper Methods:
 
     /**
      * DEBUGGING HELPER!!!

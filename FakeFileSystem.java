@@ -6,6 +6,9 @@ public class FakeFileSystem implements Device{
 
     private RandomAccessFile files[];
 
+    /**
+     * Constructor.
+     */
     FakeFileSystem(){
         files = new RandomAccessFile[Device.DEVICE_COUNT];
     }

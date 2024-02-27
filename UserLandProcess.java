@@ -2,16 +2,16 @@ import java.util.concurrent.Semaphore;
 
 abstract class UserLandProcess implements Runnable{
     
-    private Thread thread;
-    private Semaphore sem;
-    private boolean isExpired;
-    private boolean isDone;
+    private Thread thread;      // The thread for this process
+    private Semaphore sem;      // The semaphore for this process
+    private boolean isExpired;  // Is this process timed out?
+    private boolean isDone;     // Is this process done?
 
     /**
      * Constructor.
      */
     UserLandProcess(){
-        thread = new Thread(this);
+        thread = new Thread(this, ("ULP: " + this.getClass()));
         sem = new Semaphore(0);
         isExpired = false;
         isDone = false;

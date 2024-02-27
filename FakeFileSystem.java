@@ -4,16 +4,15 @@ import java.io.RandomAccessFile;
 
 public class FakeFileSystem implements Device{
 
-    private final int MAX_FILES = 10;
     private RandomAccessFile files[];
 
     FakeFileSystem(){
-        files = new RandomAccessFile[MAX_FILES];
+        files = new RandomAccessFile[Device.DEVICE_COUNT];
     }
 
     public int open(String s) {
         int fid=-1;
-        for(int i=0; i<MAX_FILES; i++){
+        for(int i=0; i<Device.DEVICE_COUNT; i++){
             if(files[i] == null){
                 fid = i;
                 break;

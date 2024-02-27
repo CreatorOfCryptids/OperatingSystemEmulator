@@ -2,23 +2,22 @@ import java.util.Random;
 
 public class RandomDevice implements Device{
 
-    private static final int RAND_COUNT = 10;
     private Random[] rands;
 
     RandomDevice(){
-        rands = new Random[RAND_COUNT];
+        rands = new Random[Device.DEVICE_COUNT];
     }
 
     /**
      * Creates a new random device.
      * 
-     * @param s The seed for the randome device.
+     * @param s The seed for the random device.
      * @return The FID of the random device.
      */
     public int open(String s) {
 
         int fid = -1;
-        for(int i = 0; i<RAND_COUNT; i++){
+        for(int i = 0; i<Device.DEVICE_COUNT; i++){
             if(rands[i] == null){
                 fid = i;
                 break;

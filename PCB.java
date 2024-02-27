@@ -9,11 +9,18 @@ public class PCB implements Device{
 
     public PCB(UserLandProcess up, OS.Priority priority){
         this.ulp = up;
+
         this.pid = nextPID++;
         this.priority = priority;
         this.timeouts = 0;
+
         this.deviceIDs = new int [10];
+        for(int i=0; i<Device.DEVICE_COUNT;i++) {
+            deviceIDs[i] = -1;
+        }
     }
+
+    // Directly interfacing with the USP:
 
     /**
      * Calls request stop on the ULP.
@@ -65,6 +72,8 @@ public class PCB implements Device{
         ulp.start();
     }
 
+    // Keeping Tabs on the ULP:
+
     /**
      * Returns the PID of the process.
      * 
@@ -110,6 +119,8 @@ public class PCB implements Device{
         timeouts = 0;
     }
 
+    // Accessing devices for the Process:
+
     public int open(String s) {
 
     }
@@ -129,6 +140,8 @@ public class PCB implements Device{
     public int write(int id, byte[] data) {
         
     }
+
+    // Debugging helper methods:
 
     /**
      * DEBUGGING HELPER!

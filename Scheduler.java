@@ -101,6 +101,7 @@ public class Scheduler{
             getCorrespondingQueue(currentlyRunning.getPriority()).addLast(currentlyRunning);
         }
         else{
+            
             dbMes("Case: Someone died.");
         }
         
@@ -144,7 +145,7 @@ public class Scheduler{
     }
 
     /**
-     * Helper Method: Returns the queue that corresponds to the given Priority level.
+     * Returns the queue that corresponds to the given Priority level.
      * 
      * @param priority The priority level of the desired queue
      * @return The LinkedList that corresponds to the passed priority level
@@ -203,6 +204,11 @@ public class Scheduler{
         }
     }
 
+    /**
+     * The getCurrentlyRunning() accessor.
+     * 
+     * @return The currentlyRunning process's PCB.
+     */
     public PCB getCurrentlyRunning(){
         return currentlyRunning;
     }

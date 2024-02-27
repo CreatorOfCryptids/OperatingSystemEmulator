@@ -1,27 +1,38 @@
 public class VFS implements Device{
 
-    private final int DEVICE_COUNT = 10;    // The max amount of devices this OS can hold.
-
-    private DeviceMap[] devices;            // A list of the devices currently in use.
-    private RandomDevice randDev;           // A reference to the random device object.
-    private FakeFileSystem FFSDev;          // A reference to the FakeFileSystem object.
+    public final int CODELEN = 3;   // Length of the device code Strings.
+    private DeviceMap[] devices;    // A list of the devices currently in use.
+    private RandomDevice randDev;   // A reference to the random device object.
+    private FakeFileSystem FFSDev;  // A reference to the FakeFileSystem object.
 
     VFS(){
-        devices = new DeviceMap[DEVICE_COUNT];
+        devices = new DeviceMap[Device.DEVICE_COUNT];
         randDev = new RandomDevice();
         FFSDev = new FakeFileSystem();
-
     }
 
+    /**
+     * Opens the desired Device.
+     * 
+     * @param s A string corresponding to the desired Device.
+     */
     public int open(String s) {
         dbMes("Open() String: \"" + s + "\"");
 
         // Loop thru the list to find the first empty entry.
-        for(int i = 0; i<DEVICE_COUNT; i++){
+        for(int i = 0; i<Device.DEVICE_COUNT; i++){
             if(devices[i] == null){
-                devices[i] = new DeviceMap(s);
 
-                return i;
+                DeviceMap temp = new DeviceMap(s);
+
+                // Checki if the device is valid.
+                if(temp.getDevIndex() != -1){   // If yes, add to the list and return it's index.
+                    devices[i] = temp;
+                    return i;
+                }
+                else{                           // Otherwize, return failure.
+                    return -1;
+                }
             }
         }
 
@@ -29,6 +40,11 @@ public class VFS implements Device{
         return -1;
     }
 
+    /**
+     * Closes the desired Device.
+     * 
+     * @param id The FID of the desired Device.
+     */
     public void close(int id) {
         dbMes("Close() FID: " + id);
 
@@ -36,44 +52,77 @@ public class VFS implements Device{
         devices[id] = null;     // Null this index so it can be reused.
     }
 
+    /**
+     * Reads from the desired Device.
+     * 
+     * @param id The FID of the desired Device.
+     * @param size The amount of data to be read.
+     */
     public byte[] read(int id, int size) {
         dbMes("Read(): FID: " + id + " Size: " + size);
 
         return devices[id].read(size);
     }
 
+    /**
+     * Moves the curser within the desired Device.
+     * 
+     * @param id The FID of the desired Device.
+     * @param to The distance to move the curser.
+     */
     public void seek(int id, int to) {
         dbMes("Seek(): FID: " + id + "To: " + to);
 
         devices[id].seek(to);
     }
 
+    /**
+     * Writes data to the desired Device.
+     * 
+     * @param id The FID of the desired Device.
+     * @param data The data to be writen to the device
+     * @return The amount of data successfully writen to the Device.
+     */
     public int write(int id, byte[] data) {
         dbMes("Write(): FID: " + id);
 
         return devices[id].write(data);
     }
     
+    /**
+    * EXTRA METHOD!!! Prints a message to the terminal to help bebugging.
+    * 
+    * @param message The message printed to the terminal.
+    */
     private void dbMes(String message){
         OS.dbMes("VFS: " + message);
     }
 
+    /**
+     * The DeviceMap class.
+     * 
+     * Stores A device pointer and an index for that device pointer.
+     */
     private class DeviceMap{
 
-        private final int CODELEN = 3;   // Length of the device code Strings.
-
-        private Device dev;     // The type of device that this entry maps to.
-        private int devIndex;   // The index for the file within the device.
+        private Device dev;         // The type of device that this entry maps to.
+        private int devIndex = 0;   // The index for the file within the device.
 
         DeviceMap(String s){
-            String deviceSpecifyer = s.substring(0, CODELEN);         // Device strings are only 3 char long.
+            String deviceSpecifyer = s.substring(0, CODELEN);         // Device strings are only 3 char long in my implementation.
 
             if(deviceSpecifyer.equals("RAN"))
                 dev = randDev;
             else if (deviceSpecifyer.equals("FFS"))
                 dev = FFSDev;
-            
-            devIndex = dev.open(deviceSpecifyer.substring(CODELEN +1));  // Remove space so everything after that will be passed to the devices's open().
+            else{
+                dbMes("VFS: Invalid File Specifyer");
+                devIndex = -1;
+            }
+
+            devIndex = (devIndex == -1) ? 
+                -1 :                                                // Keep the devIndex at -1 so the VFS knows it's invalid.
+                dev.open(deviceSpecifyer.substring(CODELEN +1));    // Remove space so everything after that will be passed to the devices's open().
         }
 
         public byte[] read(int size) {
@@ -92,8 +141,14 @@ public class VFS implements Device{
             dev.close(devIndex);
         }
 
+        public int getDevIndex(){
+            return devIndex;
+        }
+
         /**
          * Debugging.
+         * 
+         * @return A string containing the information contained in this DeviceMap.
          */
         public String toString(){
             return this.dev.getClass() + " devIndex: " + devIndex;

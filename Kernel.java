@@ -66,18 +66,81 @@ public class Kernel implements Runnable{
     }
 
     /**
-     * Opens the desired device.
+     * Opens the desired Device.
      * 
-     * @param device A string corresponding to the desired device.
+     * @param device A string corresponding to the desired Device.
      */
     private void open(Object device){
         if (device instanceof String)
             OS.retval = vfs.open((String) device);
         else{
-            dbMes("Object passed to kernel.open() was not a string");
+            dbMes("Object passed to Kernel.open() was not a string.");
             OS.retval = -1;
         }
     }
+
+    /**
+     * Reads from the desired Device.
+     * 
+     * @param id The FID of the desired Device.
+     * @param size The amount of data to be read.
+     */
+    public void read(Object id, Object size) {
+        if(id instanceof Integer && size instanceof Integer){
+
+        }
+        else{
+            dbMes("Objects passed to Kernel.read() were not integers.");
+            OS.retval = -1;
+        }
+    }
+
+    /**
+     * Moves the curser within the desired Device.
+     * 
+     * @param id The FID of the desired Device.
+     * @param to The distance to move the curser.
+     */
+    public void seek(Object id, Object to) {
+        if(id instanceof Integer && to instanceof Integer){
+
+        }
+        else{
+            dbMes("Objects passed to Kernel.read() were not integers.");
+            OS.retval = -1;
+        }
+    }
+
+    /**
+     * Writes to the desired Device.
+     * 
+     * @param id The FID of the desired Device.
+     * @param data The data to be writen to the Device.
+     */
+    public void write(Object id, Object data) {
+        if(id instanceof Integer && data instanceof Byte[]){
+
+        }
+        else{
+            dbMes("Objects passed to Kernel.read() were not integers.");
+            OS.retval = -1;
+        }
+    }
+    
+    /**
+     * Closes the desired Device.
+     * 
+     * @param id The FID of the desired Device.
+     */
+    public void close(Object id) {
+        if (id instanceof Integer){
+
+        }
+        else{
+            dbMes("Object passed to Kernel.close() was not an integer.");
+        }
+    }
+
     /**
      * Runs the Call left by the OS.
      */
@@ -85,8 +148,9 @@ public class Kernel implements Runnable{
 
         while(true){
             
-            sem.acquireUninterruptibly();
+            sem.acquireUninterruptibly();   // Block progress until called.
 
+            // Switch to correct function baced on current call.
             switch (OS.currentCall){
                 case CREATE:
                     dbMes("Create Process");;
@@ -108,9 +172,25 @@ public class Kernel implements Runnable{
                     open(OS.parameters.get(0));
                     break;
 
+                case READ:
+                    dbMes("READ");
+                    read(OS.parameters.get(0), OS.parameters.get(1));
+                    break;
+
+                case SEEK:
+                    dbMes("Seek");
+                    seek(OS.parameters.get(0), OS.parameters.get(1));
+                    break;
+                
+                case WRITE:
+                    dbMes("Write");
+                    write(OS.parameters.get(0), OS.parameters.get(1));
+                    break;
+
                 case CLOSE:
                     dbMes("Close");
-                    close();
+                    close(OS.parameters.get(0));
+                    break;
                 
                 default:
                     dbMes("Unknown Current Call: " + OS.currentCall);
@@ -125,7 +205,6 @@ public class Kernel implements Runnable{
      * Stops the currently running process so the kernel can start.
      */
     public void stopCurrentProcesss() {
-
         if (scheduler.getCurrentlyRunning() != null){
             dbMes("Stopping: " + scheduler.getCurrentlyRunning().getClass());
             scheduler.getCurrentlyRunning().stop();
@@ -133,31 +212,6 @@ public class Kernel implements Runnable{
         else{
             dbMes("Current Process is null");
         }
-            
-    }
-
-    public void open(Object s) {
-        if (s instanceof String){
-
-        }
-        else
-            return -1;  // TODO: how do this again?
-    }
-
-    public void close(int id) {
-        
-    }
-
-    public void read(int id, int size) {
-        
-    }
-
-    public void seek(int id, int to) {
-        
-    }
-
-    public void write(int id, byte[] data) {
-        
     }
     
     /**

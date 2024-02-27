@@ -5,6 +5,7 @@ abstract class UserLandProcess implements Runnable{
     private Thread thread;
     private Semaphore sem;
     private boolean isExpired;
+    private boolean isDone;
 
     /**
      * Constructor.
@@ -13,6 +14,7 @@ abstract class UserLandProcess implements Runnable{
         thread = new Thread(this);
         sem = new Semaphore(0);
         isExpired = false;
+        isDone = false;
 
         thread.start();
     }
@@ -42,7 +44,7 @@ abstract class UserLandProcess implements Runnable{
      * @return true when the java thread is not alive.
      */
     public boolean isDone(){
-        return !thread.isAlive();
+        return isDone;
     }
 
     /**
@@ -69,7 +71,7 @@ abstract class UserLandProcess implements Runnable{
         dbMes("Run");
         sem.acquireUninterruptibly();
         main();
-        return;
+        isDone = true;
     }
 
     /**

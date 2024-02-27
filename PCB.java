@@ -1,4 +1,4 @@
-public class PCB implements Device{
+public class PCB{
     
     private static int nextPID = 0;
     private int pid;
@@ -20,7 +20,7 @@ public class PCB implements Device{
         }
     }
 
-    // Directly interfacing with the USP:
+    // Interfacing with the USP:
 
     /**
      * Calls request stop on the ULP.
@@ -119,26 +119,50 @@ public class PCB implements Device{
         timeouts = 0;
     }
 
-    // Accessing devices for the Process:
+    // Device Management:
 
-    public int open(String s) {
+    /**
+     * Adds the PID of a new Device to this PCB's device array. Returns -1 if there are no available spots.
+     * 
+     * @param newID The FID of a new Device.
+     * @return This PCB's index for that Device, or -1 on failure.
+     */
+    public int open(int newID){
+        for(int i=0; i<Device.DEVICE_COUNT;i++) {
+            if(deviceIDs[i] == -1){
+                deviceIDs[i] = newID;
+                return newID;
+            }
+        }
 
+        return -1;
     }
 
-    public void close(int id) {
-        
+    /**
+     * Gets the FID of a device from this PCB's device index.
+     * 
+     * @param index
+     * @return The FID of the desired Device index.
+     */
+    public int getFID(int index){
+        return deviceIDs[index];
     }
 
-    public byte[] read(int id, int size) {
-        
+    /**
+     * Sets the index of a device to be -1.
+     * 
+     * @param index The index within the device map to be set to -1.
+     * @return The FID of the closed device.
+     */
+    public int close(int index){
+        int retval = deviceIDs[index];
+        deviceIDs[index] = -1;
+        return retval;
     }
 
-    public void seek(int id, int to) {
-        
-    }
-
-    public int write(int id, byte[] data) {
-        
+    
+    public int[] getDeviceIDs(){
+        return deviceIDs;
     }
 
     // Debugging helper methods:

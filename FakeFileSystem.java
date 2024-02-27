@@ -10,6 +10,11 @@ public class FakeFileSystem implements Device{
         files = new RandomAccessFile[Device.DEVICE_COUNT];
     }
 
+    /**
+     * Opens the desired File.
+     * 
+     * @param device The desired file's name.
+     */
     public int open(String s) {
         int fid=-1;
         for(int i=0; i<Device.DEVICE_COUNT; i++){
@@ -38,23 +43,12 @@ public class FakeFileSystem implements Device{
             return -1;
     }
 
-    public void close(int id) {
-        dbMes("Close()");
-        if(files[id] == null){
-            dbMes("Close(): ERROR: Null device");
-        }
-        else{
-            try{
-                files[id].close();
-            }
-            catch (IOException e){
-                dbMes("Close(): ERROR: " + e.getMessage());
-            }
-
-            files[id] = null;
-        }
-    }
-
+    /**
+     * Reads from the desired File.
+     * 
+     * @param id The FID of the desired File.
+     * @param size The amount of data to be read.
+     */
     public byte[] read(int id, int size) {
         byte[] retval = new byte[size];
 
@@ -70,6 +64,12 @@ public class FakeFileSystem implements Device{
         }
     }
 
+    /**
+     * Moves the curser within the file.
+     * 
+     * @param id The FID of the file.
+     * @param to The distance to move the curser.
+     */
     public void seek(int id, int to) {
         dbMes("Seek()");
         try{
@@ -80,6 +80,12 @@ public class FakeFileSystem implements Device{
         }
     }
 
+    /**
+     * Writes to the desired File.
+     * 
+     * @param id The FID of the desired File.
+     * @param data The data to be writen to the File.
+     */
     public int write(int id, byte[] data) {
         dbMes("Write()");
 
@@ -90,6 +96,28 @@ public class FakeFileSystem implements Device{
         catch(IOException e){
             dbMes("Write(): ERROR: " + e.getMessage());
             return -1;
+        }
+    }
+    
+    /**
+     * Closes the desired File.
+     * 
+     * @param id The FID of the desired File.
+     */
+    public void close(int id) {
+        dbMes("Close()");
+        if(files[id] == null){
+            dbMes("Close(): ERROR: Null device");
+        }
+        else{
+            try{
+                files[id].close();
+            }
+            catch (IOException e){
+                dbMes("Close(): ERROR: " + e.getMessage());
+            }
+
+            files[id] = null;
         }
     }
 

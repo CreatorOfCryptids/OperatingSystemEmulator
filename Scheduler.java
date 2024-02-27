@@ -6,7 +6,8 @@ import java.util.concurrent.Semaphore;
 import java.time.Clock;
 
 public class Scheduler{
-    
+
+    private PCB currentlyRunning;                   // The process that is currently running.
     private LinkedList<PCB> realTimeQ;              // The queueues of running prosesses.
     private LinkedList<PCB> interactiveQ;   
     private LinkedList<PCB> backgroundQ;
@@ -14,25 +15,29 @@ public class Scheduler{
     private LinkedList<SleepingProcess> sleeping;   // The queueue of sleeping processes 
     private Clock clock;                            // Clock
 
-    private Random rand;
+    private Random rand;                            // The random number generator for the random 
     private Semaphore sem;                          // The semaphore that makes sure that the threads don't overlap with eachother.
     private Timer timer;                            // Schedules an interrupt for every 250 ms
-    private PCB currentlyRunning;                    // The process that is currently running.
+
+    private Kernel kernel;                          // A reference to the Kernel
+    
 
     /**
      * Constructor.
      */
-    Scheduler(){
-        realTimeQ = new LinkedList<PCB>();
-        interactiveQ = new LinkedList<PCB>();
-        backgroundQ = new LinkedList<PCB>();
+    Scheduler(Kernel kernel){
+        this.realTimeQ = new LinkedList<PCB>();
+        this.interactiveQ = new LinkedList<PCB>();
+        this.backgroundQ = new LinkedList<PCB>();
 
-        sleeping = new LinkedList<SleepingProcess>();
-        clock = Clock.systemUTC();
+        this.sleeping = new LinkedList<SleepingProcess>();
+        this.clock = Clock.systemUTC();
 
-        rand = new Random();
-        timer = new Timer();
-        sem = new Semaphore(1);
+        this.rand = new Random();
+        this.timer = new Timer();
+        this.sem = new Semaphore(1);
+
+        this.kernel = kernel;
         
         timer.scheduleAtFixedRate(new Interupt(), 250, 250);
     }
@@ -101,8 +106,13 @@ public class Scheduler{
             getCorrespondingQueue(currentlyRunning.getPriority()).addLast(currentlyRunning);
         }
         else{
-            
             dbMes("Case: Someone died.");
+
+            // Close the dead process's devices, if it hasn't done so already.
+            int[] deviceIDs = currentlyRunning.getDeviceIDs();
+            for(int i = 0; i< deviceIDs.length; i++)
+                if(deviceIDs[i] != -1)
+                    kernel.close(deviceIDs[i]);
         }
         
         // Get the next process in the queue and set it to currently running.

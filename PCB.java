@@ -134,10 +134,10 @@ public class PCB{
      * @return This PCB's index for that Device, or -1 on failure.
      */
     public int open(int newID){
-        for(int i=0; i<Device.DEVICE_COUNT;i++) {
+        for(int i = 0; i<Device.DEVICE_COUNT; i++) {
             if(deviceIDs[i] == -1){
                 deviceIDs[i] = newID;
-                return newID;
+                return i;
             }
         }
 

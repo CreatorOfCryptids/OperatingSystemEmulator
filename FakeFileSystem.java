@@ -19,20 +19,27 @@ public class FakeFileSystem implements Device{
      * @param device The desired file's name.
      */
     public int open(String s) {
-        int fid=-1;
+
+        int fid = -1;
+
+        // Look for an open entry
         for(int i=0; i<Device.DEVICE_COUNT; i++){
-            if(files[i] == null){
+            if(files[i] == null){   // If we find one, store the entry.
                 fid = i;
                 break;
             }
         }
+        
+        s.trim();   // Get rid of any leading/tailing whitespace.
 
-        dbMes("OPEN: fid = " + fid + "String = \"" + s + "\"");
+        dbMes("OPEN: fid = " + fid + " String = \"" + s + "\"");
 
         if(fid == -1){
+            // If we didn't find an open entry, return failure.
             return -1;
         }
         else if (s != null && s.equals("") == false){
+            // If the string is valid, open the file and return the fid.
             try{
                 files[fid] = new RandomAccessFile(s, "rw");
                 return fid;

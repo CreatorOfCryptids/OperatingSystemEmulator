@@ -168,15 +168,14 @@ public class Kernel implements Runnable{
     public void read(Object id, Object size) {
         // Check the parameters for validity
         if(id instanceof Integer && size instanceof Integer){
-
             // Make sure the id is in the correct range.
-            if ((int) id < 0 || (int) id > Device.DEVICE_COUNT){
-                // If its outside the range, return failure 
-                OS.retval = -1; 
+            if ((int) id >= 0 && (int) id < Device.DEVICE_COUNT){
+                // Return the data.
+                OS.retval = vfs.read(scheduler.getCurrentlyRunning().getFID((int) id), (int)size);
             }
             else{                
-                // Otherwize return the data.
-                OS.retval = vfs.read(scheduler.getCurrentlyRunning().getFID((int) id), (int)size);
+                // If its outside the range, return failure.
+                OS.retval = -1; 
             }
         }
         else{
@@ -194,8 +193,12 @@ public class Kernel implements Runnable{
     public void seek(Object id, Object to) {
         if(id instanceof Integer && to instanceof Integer){
             // Make sure the id is in the correct range.
-            if (!((int) id < 0 || (int) id > Device.DEVICE_COUNT))
+            if ((int) id >= 0 && (int) id < Device.DEVICE_COUNT)
                 vfs.seek(scheduler.getCurrentlyRunning().getFID((int) id), (int)to);
+            else{
+                dbMes("ERROR: FID " + (int) id + " is not valid.");
+                OS.retval = -1;
+            }
         }
         else{
             dbMes("Objects passed to Kernel.read() were not integers.");
@@ -212,12 +215,13 @@ public class Kernel implements Runnable{
     public void write(Object id, Object data) {
         if(id instanceof Integer && data instanceof Byte[]){
             // Make sure the id is in the correct range.
-            if ((int) id < 0 || (int) id > Device.DEVICE_COUNT)
-                // If its outside the range, return failure.
-                OS.retval = -1; 
-            else
+            if ((int) id >= 0 && (int) id < Device.DEVICE_COUNT)
                 // Otherwize return the data.
                 OS.retval = vfs.write(scheduler.getCurrentlyRunning().getFID((int) id), (byte[])data);
+            else{
+                // If its outside the range, return failure.
+                OS.retval = -1; 
+            }
         }
         else{
             dbMes("Objects passed to Kernel.read() were not integers.");
@@ -233,8 +237,9 @@ public class Kernel implements Runnable{
     public void close(Object id) {
         if (id instanceof Integer){
             // Make sure the FID is in the correct range.
-            if (!((int) id < 0 || (int) id > Device.DEVICE_COUNT))
+            if (!((int) id >= 0 && (int) id < Device.DEVICE_COUNT)){
                 vfs.close(scheduler.getCurrentlyRunning().close((int) id));
+            }
         }
         else{
             dbMes("Object passed to Kernel.close() was not an integer.");

@@ -93,7 +93,7 @@ abstract class UserLandProcess implements Runnable{
      * 
      * @param message The debugging message.
      */
-    private void dbMes(String message){
+    protected void dbMes(String message){
         OS.dbMes("USERLAND_PROCESS (" + this.getClass() + "): " + message);
     }
 }

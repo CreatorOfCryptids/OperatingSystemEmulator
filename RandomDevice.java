@@ -17,23 +17,31 @@ public class RandomDevice implements Device{
     public int open(String s) {
 
         int fid = -1;
+
+        // Look for an open space.
         for(int i = 0; i<Device.DEVICE_COUNT; i++){
-            if(rands[i] == null){
+            if(rands[i] == null){   // If one is found, store to fid.
                 fid = i;
                 break;
             }
         }
 
-        dbMes("OPEN: fid = " + fid + "String = \"" + s + "\"");
+        dbMes("OPEN: fid = " + fid + " String = \"" + s + "\"");
 
-        if(fid == -1)
+        if(fid == -1){
+            // If an open space wasn't found return error.
             return -1;
-        else if(s != null && s.equals("") == false)
+        }
+        else if(s != null && s.equals("") == false){
+            // If they gave us a seed, use that to seed the rand.
             rands[fid] = new Random(s.hashCode());
-        else
+        }
+        else{
+            // Otherwize, seed rand with rand.
             rands[fid] = new Random();
-        
-        return fid++;
+        }
+            
+        return fid;
     }
 
     /**

@@ -48,8 +48,10 @@ public class VFS implements Device{
     public void close(int id) {
         dbMes("Close() FID: " + id);
 
-        devices[id].close();
-        devices[id] = null;     // Null this index so it can be reused.
+        if (id >= 0 && id < Device.DEVICE_COUNT){
+            devices[id].close();
+            devices[id] = null;     // Null this index so it can be reused.
+        }
     }
 
     /**
@@ -61,7 +63,12 @@ public class VFS implements Device{
     public byte[] read(int id, int size) {
         dbMes("Read(): FID: " + id + " Size: " + size);
 
-        return devices[id].read(size);
+        if (id >= 0 && id < Device.DEVICE_COUNT){
+            return devices[id].read(size);
+        }
+        else{
+            return new byte[]{-1};
+        }
     }
 
     /**
@@ -73,7 +80,9 @@ public class VFS implements Device{
     public void seek(int id, int to) {
         dbMes("Seek(): FID: " + id + "To: " + to);
 
-        devices[id].seek(to);
+        if (id >= 0 && id < Device.DEVICE_COUNT){
+            devices[id].seek(to);
+        }
     }
 
     /**
@@ -86,7 +95,12 @@ public class VFS implements Device{
     public int write(int id, byte[] data) {
         dbMes("Write(): FID: " + id);
 
-        return devices[id].write(data);
+        if (id >= 0 && id < Device.DEVICE_COUNT){
+            return devices[id].write(data);
+        }
+        else{
+            return -1;
+        }
     }
     
     /**
@@ -121,8 +135,8 @@ public class VFS implements Device{
             }
 
             devIndex = (devIndex == -1) ? 
-                -1 :                                                // Keep the devIndex at -1 so the VFS knows it's invalid.
-                dev.open(deviceSpecifyer.substring(CODELEN +1));    // Remove space so everything after that will be passed to the devices's open().
+                -1 :                            // Keep the devIndex at -1 so the VFS knows it's invalid.
+                dev.open(s.substring(CODELEN)); // Pass the rest of the string to the devices's open().
         }
 
         public byte[] read(int size) {

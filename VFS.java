@@ -1,6 +1,6 @@
 public class VFS implements Device{
 
-    public final int CODELEN = 3;   // Length of the device code Strings.
+    public final int CODELEN = 4;   // Length of the device code Strings.
     private DeviceMap[] devices;    // A list of the devices currently in use.
     private RandomDevice randDev;   // A reference to the random device object.
     private FakeFileSystem FFSDev;  // A reference to the FakeFileSystem object.
@@ -111,9 +111,9 @@ public class VFS implements Device{
         DeviceMap(String s){
             String deviceSpecifyer = s.substring(0, CODELEN);         // Device strings are only 3 char long in my implementation.
 
-            if(deviceSpecifyer.equals("RAN"))
+            if(deviceSpecifyer.equals("RAND"))
                 dev = randDev;
-            else if (deviceSpecifyer.equals("FFS"))
+            else if (deviceSpecifyer.equals("FILE"))
                 dev = FFSDev;
             else{
                 dbMes("VFS: Invalid File Specifyer");

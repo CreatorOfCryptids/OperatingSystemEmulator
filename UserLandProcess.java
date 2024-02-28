@@ -72,6 +72,8 @@ abstract class UserLandProcess implements Runnable{
         sem.acquireUninterruptibly();
         main();
         isDone = true;
+        System.out.println("I died.");
+        OS.switchProcess();
     }
 
     /**

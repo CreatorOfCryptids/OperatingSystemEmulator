@@ -1,5 +1,3 @@
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public class FakeFileSystem implements Device{
@@ -21,6 +19,7 @@ public class FakeFileSystem implements Device{
     public int open(String s) {
 
         int fid = -1;
+        s = s.trim();   // Trim any uneeded whitespace.
 
         // Look for an open entry
         for(int i=0; i<Device.DEVICE_COUNT; i++){
@@ -30,7 +29,7 @@ public class FakeFileSystem implements Device{
             }
         }
         
-        s.trim();   // Get rid of any leading/tailing whitespace.
+           // Get rid of any leading/tailing whitespace.
 
         dbMes("OPEN: fid = " + fid + " String = \"" + s + "\"");
 
@@ -41,11 +40,11 @@ public class FakeFileSystem implements Device{
         else if (s != null && s.equals("") == false){
             // If the string is valid, open the file and return the fid.
             try{
-                files[fid] = new RandomAccessFile(s, "rw");
+                files[fid] = new RandomAccessFile(s, "rws"); //Trim any whitespace from the string.
                 return fid;
             }
-            catch (FileNotFoundException e){
-                dbMes("Open(): ERROR: FileNotFound");
+            catch (Exception e){
+                dbMes("Open(): ERROR: " + e.getMessage());
                 return -1;
             }
         }
@@ -68,7 +67,7 @@ public class FakeFileSystem implements Device{
             files[id].read(retval);
             return retval;
         }
-        catch (IOException e){
+        catch (Exception e){
             dbMes("Read(): ERROR: " + e.getMessage());
             return new byte[]{-1};
         }
@@ -83,9 +82,9 @@ public class FakeFileSystem implements Device{
     public void seek(int id, int to) {
         dbMes("Seek()");
         try{
-            files[id].seek(files[id].getFilePointer() + to);
+            files[id].seek(to);
         }
-        catch(IOException e){
+        catch(Exception e){
             dbMes("Seek(): ERROR: " + e.getMessage());
         }
     }
@@ -103,7 +102,7 @@ public class FakeFileSystem implements Device{
             files[id].write(data);
             return data.length;
         } 
-        catch(IOException e){
+        catch(Exception e){
             dbMes("Write(): ERROR: " + e.getMessage());
             return -1;
         }
@@ -123,7 +122,7 @@ public class FakeFileSystem implements Device{
             try{
                 files[id].close();
             }
-            catch (IOException e){
+            catch (Exception e){
                 dbMes("Close(): ERROR: " + e.getMessage());
             }
 

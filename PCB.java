@@ -192,6 +192,6 @@ public class PCB{
      * @param Message
      */
     private void dbMes(String Message){
-        //OS.dbMes("PCB (" + ulp.getClass() + "): " + Message);
+        OS.dbMes("PCB (" + ulp.getClass() + "): " + Message);
     }
 }

@@ -113,8 +113,10 @@ public class Scheduler{
             // Close the dead process's devices, if it hasn't done so already.
             int[] deviceIDs = currentlyRunning.getDeviceIDs();
             for(int i = 0; i< deviceIDs.length; i++)
-                if(deviceIDs[i] != -1)
+                if(deviceIDs[i] != -1){
+                    dbMes("Removed device.");
                     kernel.close(deviceIDs[i]);
+                }
         }
         
         // Get the next process in the queue and set it to currently running.

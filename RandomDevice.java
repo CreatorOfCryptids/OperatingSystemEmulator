@@ -34,7 +34,7 @@ public class RandomDevice implements Device{
         }
         else if(s != null && s.equals("") == false){
             // If they gave us a seed, use that to seed the rand.
-            rands[fid] = new Random(s.hashCode());
+            rands[fid] = new Random(s.hashCode());  // Hash so they can send anything as the seed and it wont break.
         }
         else{
             // Otherwize, seed rand with rand.

@@ -283,6 +283,6 @@ public class OS {
      * @param message The message printed to the terminal.
      */
     public static void dbMes(String message){
-        System.out.println("    ||"+message);
+        //System.out.println("    ||"+message);
     }
 }

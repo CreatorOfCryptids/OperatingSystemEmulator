@@ -202,16 +202,16 @@ public class Kernel implements Runnable{
     public void seek(Object id, Object to) {
         if(id instanceof Integer && to instanceof Integer){
             // Make sure the id is in the correct range.
-            if ((int) id >= 0 && (int) id < Device.DEVICE_COUNT)
+            if ((int) id >= 0 && (int) id < Device.DEVICE_COUNT){
                 vfs.seek(scheduler.getCurrentlyRunning().getFID((int) id), (int)to);
+                dbMes("Seeked.");
+            }
             else{
                 dbMes("SEEK_ERROR: FID " + (int) id + " out of bounds.");
-                OS.retval = -1;
             }
         }
         else{
             dbMes("Objects passed to Kernel.read() were not integers.");
-            OS.retval = -1;
         }
     }
 

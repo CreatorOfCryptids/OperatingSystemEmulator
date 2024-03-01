@@ -4,7 +4,7 @@ public class MereMortal extends UserLandProcess{
 
         System.out.println("Starting MereMortal.");
 
-        int fid = OS.open("RAND 300");
+        int fid = OS.open("RAND 69");
         if(fid == -1){
             dbMes("ERROR: Issue opening test.txt");
         }
@@ -17,7 +17,7 @@ public class MereMortal extends UserLandProcess{
 
             System.out.printf("I AM MORTAL, I WILL DIE ONE DAY. FID = %d, Rand = %d\n", fid, OS.read(fid, 1)[0]);
 
-            OS.sleep(20);
+            OS.sleep(200);
         }
 
         System.out.println("I WILL DIE NOW, AVENGE MEEEEE!!!"); // Idek, but this tests what happens, and lets us know it's dead.

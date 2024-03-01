@@ -27,7 +27,7 @@ public class Reader extends UserLandProcess{
 
 
             // Sleep to avoid ban hammer.
-            OS.sleep(30);
+            OS.sleep(200);
         }
     }
 }

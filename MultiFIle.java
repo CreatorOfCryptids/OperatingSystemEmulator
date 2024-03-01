@@ -12,7 +12,7 @@ public class MultiFIle extends UserLandProcess{
             }
 
             // Open rand
-            int randFID = OS.open("RAND 69");
+            int randFID = OS.open("RAND");
             if(randFID == -1){
                 dbMes("ERROR: Issue opening test.txt");
             }
@@ -25,7 +25,9 @@ public class MultiFIle extends UserLandProcess{
             System.out.printf("Read %d from Rand\n", data[0]);
 
             // Seek to beginning
-            // OS.seek(ffsFID, 0);
+            System.out.println("MultiFile Seeking");
+            OS.seek(ffsFID, 0);
+            System.out.println("MF: Seeked");;
 
             // OS.sleep(10);
             
@@ -45,7 +47,7 @@ public class MultiFIle extends UserLandProcess{
             cooperate();
 
             // Sleep.
-            OS.sleep(30);
+            OS.sleep(200);
         }
     }
 }

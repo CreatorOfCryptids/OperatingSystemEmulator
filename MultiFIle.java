@@ -25,7 +25,9 @@ public class MultiFIle extends UserLandProcess{
             System.out.printf("Read %d from Rand\n", data[0]);
 
             // Seek to beginning
-            OS.seek(ffsFID, 0);
+            // OS.seek(ffsFID, 0);
+
+            // OS.sleep(10);
             
             // Write to file
             System.out.println("Writing to test.txt");
@@ -38,6 +40,7 @@ public class MultiFIle extends UserLandProcess{
             System.out.println("Closing files");
             OS.close(ffsFID);
             OS.close(randFID);
+            System.out.println("Files closed.");
 
             cooperate();
 

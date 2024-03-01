@@ -28,15 +28,18 @@ public class VFS implements Device{
                 // Checki if the device is valid.
                 if(temp.getDevIndex() != -1){   // If yes, add to the list and return it's index.
                     devices[i] = temp;
+                    dbMes("");
                     return i;
                 }
                 else{                           // Otherwize, return failure.
+                    dbMes("ERROR: Could not open Device.");
                     return -1;
                 }
             }
         }
 
         // If no entries, return error code.
+        dbMes("ERROR: No available entries.");
         return -1;
     }
 
@@ -109,7 +112,7 @@ public class VFS implements Device{
     * @param message The message printed to the terminal.
     */
     private void dbMes(String message){
-        OS.dbMes("VFS: " + message);
+        OS.dbMes("||VFS: " + message);
     }
 
     /**
@@ -125,10 +128,14 @@ public class VFS implements Device{
         DeviceMap(String s){
             String deviceSpecifyer = s.substring(0, CODELEN);         // Device strings are only 3 char long in my implementation.
 
-            if(deviceSpecifyer.equals("RAND"))
+            if(deviceSpecifyer.equals("RAND")){
                 dev = randDev;
-            else if (deviceSpecifyer.equals("FILE"))
+                dbMes("Case: Random");
+            }
+            else if (deviceSpecifyer.equals("FILE")){
                 dev = FFSDev;
+                dbMes("Case: File");
+            }
             else{
                 dbMes("VFS: Invalid File Specifyer");
                 devIndex = -1;
@@ -157,6 +164,10 @@ public class VFS implements Device{
 
         public int getDevIndex(){
             return devIndex;
+        }
+
+        private void dbMes(String message){
+            OS.dbMes("|||DeviceMap: " + message);
         }
 
         /**

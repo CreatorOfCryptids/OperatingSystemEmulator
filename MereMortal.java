@@ -4,13 +4,14 @@ public class MereMortal extends UserLandProcess{
 
         System.out.println("Starting MereMortal.");
 
+        int fid = OS.open("RAND 300");
+        if(fid == -1){
+            dbMes("ERROR: Issue opening test.txt");
+        }
+
         for(int i=0; i<3; i++){
 
             System.out.println("MORTAL: Opening RandomDevice");
-            int fid = OS.open("RAND 300");
-            if(fid == -1){
-                dbMes("ERROR: Issue opening test.txt");
-            }
 
             cooperate();
 

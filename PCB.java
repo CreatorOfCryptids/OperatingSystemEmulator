@@ -151,6 +151,7 @@ public class PCB{
      * @return The FID of the desired Device index.
      */
     public int getFID(int index){
+        dbMes("getFID");
         return deviceIDs[index];
     }
 
@@ -192,6 +193,6 @@ public class PCB{
      * @param Message
      */
     private void dbMes(String Message){
-        OS.dbMes("PCB (" + ulp.getClass() + "): " + Message);
+        OS.dbMes("||PCB (" + ulp.getClass() + "): " + Message);
     }
 }

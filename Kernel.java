@@ -139,20 +139,28 @@ public class Kernel implements Runnable{
     private void open(Object device){
         if (device instanceof String){
 
+
             int index = vfs.open((String) device);
             int pcbIndex = -1;
 
             // Check if the VFS opened the Device.
             if(index != -1){        // On success, try to add to PCB's Device index.
-
+                dbMes("VFS didn't fail, index: " + index);
                 pcbIndex = scheduler.getCurrentlyRunning().open(index);
 
-                if(pcbIndex == -1)  // If adding to PCB's index fails, close the correct vfs entry.
+                if(pcbIndex == -1){  // If adding to PCB's index fails, close the correct vfs entry.
                     vfs.close(index);
+                    dbMes("PCB didn't have any availible room.");
+                }
+                else{
+                    dbMes("PCB index: " + pcbIndex);
+                }
+            }
+            else{
+                dbMes("VFS.open() failed.");
             }
             OS.retval = pcbIndex;   // Return the pPCB's index to the ULP. Will be -1 on a failure.
         }
-            
         else{
             dbMes("Object passed to Kernel.open() was not a string.");
             OS.retval = -1;
@@ -175,6 +183,7 @@ public class Kernel implements Runnable{
             }
             else{                
                 // If its outside the range, return failure.
+                dbMes("READ_ERROR: FID: " + (int) id + " out of bounds");
                 OS.retval = -1; 
             }
         }
@@ -196,7 +205,7 @@ public class Kernel implements Runnable{
             if ((int) id >= 0 && (int) id < Device.DEVICE_COUNT)
                 vfs.seek(scheduler.getCurrentlyRunning().getFID((int) id), (int)to);
             else{
-                dbMes("ERROR: FID " + (int) id + " is not valid.");
+                dbMes("SEEK_ERROR: FID " + (int) id + " out of bounds.");
                 OS.retval = -1;
             }
         }
@@ -213,18 +222,21 @@ public class Kernel implements Runnable{
      * @param data The data to be writen to the Device.
      */
     public void write(Object id, Object data) {
-        if(id instanceof Integer && data instanceof Byte[]){
+        //dbMes("id type: " +id.getClass() + " data type: " + data.getClass());
+        if(id instanceof Integer && data instanceof byte[]){
             // Make sure the id is in the correct range.
-            if ((int) id >= 0 && (int) id < Device.DEVICE_COUNT)
+            if ((int) id >= 0 && (int) id < Device.DEVICE_COUNT){
                 // Otherwize return the data.
                 OS.retval = vfs.write(scheduler.getCurrentlyRunning().getFID((int) id), (byte[])data);
+            } 
             else{
                 // If its outside the range, return failure.
+                dbMes("WRITE_ERROR: FID " + (int) id + " out of bounds.");
                 OS.retval = -1; 
             }
         }
         else{
-            dbMes("Objects passed to Kernel.read() were not integers.");
+            dbMes("WRITE_ERROR: Objects passed to Kernel.write() were not of the right type.");
             OS.retval = -1;
         }
     }
@@ -237,8 +249,11 @@ public class Kernel implements Runnable{
     public void close(Object id) {
         if (id instanceof Integer){
             // Make sure the FID is in the correct range.
-            if (!((int) id >= 0 && (int) id < Device.DEVICE_COUNT)){
+            if ((int) id >= 0 && (int) id < Device.DEVICE_COUNT){
                 vfs.close(scheduler.getCurrentlyRunning().close((int) id));
+            }
+            else{
+                dbMes("CLOSE_ERROR: FID " + (int) id + " out of bounds.");
             }
         }
         else{
@@ -267,6 +282,6 @@ public class Kernel implements Runnable{
      * @param message The debug message.
      */
     private void dbMes(String message){
-        OS.dbMes("KERNEL: " + message);
+        OS.dbMes("|KERNEL: " + message);
     }
 }

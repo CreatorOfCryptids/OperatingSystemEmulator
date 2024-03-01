@@ -35,12 +35,14 @@ public class FakeFileSystem implements Device{
 
         if(fid == -1){
             // If we didn't find an open entry, return failure.
+            dbMes("ERROR: No availible entry.");
             return -1;
         }
         else if (s != null && s.equals("") == false){
             // If the string is valid, open the file and return the fid.
             try{
-                files[fid] = new RandomAccessFile(s, "rws"); //Trim any whitespace from the string.
+                files[fid] = new RandomAccessFile(s, "rw"); //Trim any whitespace from the string.
+                dbMes("FID: " + fid);
                 return fid;
             }
             catch (Exception e){
@@ -65,6 +67,7 @@ public class FakeFileSystem implements Device{
 
         try{
             files[id].read(retval);
+            dbMes("Read: \"" + new String(retval) + "\"");
             return retval;
         }
         catch (Exception e){
@@ -83,6 +86,7 @@ public class FakeFileSystem implements Device{
         dbMes("Seek()");
         try{
             files[id].seek(to);
+            dbMes("Seeked.");
         }
         catch(Exception e){
             dbMes("Seek(): ERROR: " + e.getMessage());
@@ -96,7 +100,7 @@ public class FakeFileSystem implements Device{
      * @param data The data to be writen to the File.
      */
     public int write(int id, byte[] data) {
-        dbMes("Write()");
+        dbMes("Write() \"" + new String(data) + "\"");
 
         try{
             files[id].write(data);
@@ -136,6 +140,6 @@ public class FakeFileSystem implements Device{
     * @param message The message printed to the terminal.
     */
     private void dbMes(String message){
-        OS.dbMes("FAKE_FILE_SYS: " + message);
+        OS.dbMes("|||FAKE_FILE_SYS: " + message);
     }
 }

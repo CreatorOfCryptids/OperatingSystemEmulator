@@ -153,7 +153,7 @@ public class Scheduler{
             }
         }
 
-        dbMes("Sleeping has " + sleeping.size() + " members in the queue");
+        dbMes("Sleeping has " + sleeping.size() + " members in the queue: " + sleeping.toString());
 
         currentlyRunning = getRandomQueue().removeFirst();
     }
@@ -292,6 +292,6 @@ public class Scheduler{
      * @param message The debug message.
      */
     public void dbMes(String message){
-        OS.dbMes("SCHEDULER: " + message);
+        OS.dbMes("||SCHEDULER: " + message);
     }
 }

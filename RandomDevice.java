@@ -30,6 +30,7 @@ public class RandomDevice implements Device{
 
         if(fid == -1){
             // If an open space wasn't found return error.
+            dbMes("ERROR: No available entries.");
             return -1;
         }
         else if(s != null && s.equals("") == false){
@@ -40,7 +41,8 @@ public class RandomDevice implements Device{
             // Otherwize, seed rand with rand.
             rands[fid] = new Random();
         }
-            
+        
+        dbMes("FID: " + fid);
         return fid;
     }
 
@@ -99,6 +101,6 @@ public class RandomDevice implements Device{
     * @param message The message printed to the terminal.
     */
     private void dbMes(String message){
-        OS.dbMes("RAND_DEV: " + message);
+        OS.dbMes("|||RAND_DEV: " + message);
     }
 }

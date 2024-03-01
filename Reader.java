@@ -13,9 +13,11 @@ public class Reader extends UserLandProcess{
 
             cooperate();
 
+            System.out.println("Reader: Seeking");
             OS.seek(ffsFID, 0);
 
             // Read file.
+            System.out.println("Reader: Reading");
             byte output = OS.read(ffsFID, 1)[0];
             System.out.printf("READER: From file: %d\n", output);
 

@@ -23,13 +23,6 @@ public class MultiFIle extends UserLandProcess{
             System.out.println("Reading from Rand");
             byte[] data = OS.read(randFID, 1);
             System.out.printf("Read %d from Rand\n", data[0]);
-
-            // Seek to beginning
-            System.out.println("MultiFile Seeking");
-            OS.seek(ffsFID, 0);
-            System.out.println("MF: Seeked");;
-
-            // OS.sleep(10);
             
             // Write to file
             System.out.println("Writing to test.txt");

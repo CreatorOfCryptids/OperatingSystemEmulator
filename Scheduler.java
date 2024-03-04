@@ -169,6 +169,37 @@ public class Scheduler{
         return currentlyRunning;
     }
 
+    /**
+     * Return the PID of the desired process.
+     * 
+     * @param name The name of the desired process.
+     * @return The PID of the desired process, or -1 on failure.
+     */
+    public int getPID(String name){
+
+        // Check the realTimeProcesses for the process.
+        for(PCB pcb : realTimeQ)
+            if(pcb.getName().equals(name))
+                return pcb.getPID();
+        
+        // Check the interactive processes for the process.
+        for(PCB pcb : interactiveQ)
+            if(pcb.getName().equals(name))
+                return pcb.getPID();
+        
+        // Check the background processes for the process.
+        for(PCB pcb : backgroundQ)
+            if(pcb.getName().equals(name))
+                return pcb.getPID();
+        
+        // Check the sleeping processes for the process.
+        for(SleepingProcess sp: sleeping)
+            if(sp.getProcess().getName().equals(name))
+                return sp.getProcess().getPID();
+
+        return -1;
+    }
+
     // Helper Methods:
 
     /**
@@ -251,6 +282,15 @@ public class Scheduler{
         }
 
         /**
+         * The getProcess() accessor.
+         * 
+         * @return The process in the SleepingProcess Wrapper.
+         */
+        public PCB getProcess(){
+            return process;
+        }
+        
+        /**
          * Accesses the time that this process should be woken up.
          * 
          * @return The time that the process should be woken up.
@@ -279,6 +319,11 @@ public class Scheduler{
             }   
         }
 
+        /**
+         * The toString() method. Helps with debugging
+         * 
+         * @return A string containing the information in the list.
+         */
         public String toString(){
             return "Sleepy " + process.toString();
         }

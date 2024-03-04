@@ -41,6 +41,8 @@ abstract class UserLandProcess implements Runnable{
     }
 
     /**
+     * Friendship ended with thread.isAlive(). Keeping track of it ourseves is the real homie now.
+     * 
      * @return true when the java thread is not alive.
      */
     public boolean isDone(){
@@ -71,6 +73,8 @@ abstract class UserLandProcess implements Runnable{
         dbMes("Run");
         sem.acquireUninterruptibly();
         main();
+
+        // I am doing this because thead.isAlive() didn't give us the right answer and This wouldn't be able to cooperate the right way. 
         isDone = true;
         System.out.println("I died.");
         OS.switchProcess();

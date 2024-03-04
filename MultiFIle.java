@@ -21,13 +21,19 @@ public class MultiFIle extends UserLandProcess{
 
             // Read from rand
             System.out.println("Reading from Rand");
-            byte[] data = OS.read(randFID, 1);
-            System.out.printf("Read %d from Rand\n", data[0]);
+            byte[] data = OS.read(randFID, 4);
+            System.out.println("Read "+ new String(data) +" from Rand");
             
             // Write to file
             System.out.println("Writing to test.txt");
             if(OS.write(ffsFID, data) == -1)
                 dbMes("ERROR: Issue writing to test.txt");
+
+            cooperate();
+
+            System.out.println("MF: Seeking");
+            OS.seek(ffsFID, 0);
+            System.out.println("MF: Seeked");
 
             cooperate();
 

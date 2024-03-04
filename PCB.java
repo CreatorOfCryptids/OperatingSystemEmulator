@@ -1,11 +1,14 @@
+import java.util.LinkedList;
+
 public class PCB{
     
-    private static int nextPID = 0; // Stores the number of PCBs.
-    private int pid;                // This PCB's PID.
-    private UserLandProcess ulp;    // The ULP under this PCB's control
-    private OS.Priority priority;   // The ULP's priority.
-    private int timeouts;           // The number of times that this ULP has gone to timeout.
-    private int[] deviceIDs;        // The index of differnt Devices that this ULP has access to.
+    private static int nextPID = 0;         // Stores the number of PCBs.
+    private int pid;                        // This PCB's PID.
+    private UserLandProcess ulp;            // The ULP under this PCB's control
+    private OS.Priority priority;           // The ULP's priority.
+    private int timeouts;                   // The number of times that this ULP has gone to timeout.
+    private int[] deviceIDs;                // The index of differnt Devices that this ULP has access to.
+    private LinkedList<Message> messages;   // The queue of messages sent to this process.
 
     /**
      * Constructor
@@ -24,6 +27,8 @@ public class PCB{
         for(int i=0; i<Device.DEVICE_COUNT;i++) {
             deviceIDs[i] = -1;
         }
+
+        this.messages = new LinkedList<Message>();
     }
 
     // Interfacing with the USP:
@@ -87,6 +92,15 @@ public class PCB{
      */
     public int getPID(){
         return pid;
+    }
+
+    /**
+     * The getName() accessor.
+     * 
+     * @return The name of the ULP.
+     */
+    public String getName(){
+        return ulp.getClass().getSimpleName();
     }
 
     /**
@@ -174,6 +188,15 @@ public class PCB{
      */
     public int[] getDeviceIDs(){
         return deviceIDs;
+    }
+
+    /**
+     * Adds a new message to this process's message queue.
+     * 
+     * @param mes The new message.
+     */
+    public void addMessage(Message mes){
+        messages.add(mes);
     }
 
     // Debugging helper methods:

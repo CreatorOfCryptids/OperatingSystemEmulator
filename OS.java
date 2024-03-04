@@ -8,7 +8,7 @@ public class OS {
     public static Object retval;                // The return value from the Kernel.
 
     public enum CallType{
-        CLOSE, CREATE, OPEN, READ, SEEK, SLEEP, SWITCH, WRITE
+        CLOSE, CREATE, GET_MESSAGE, GET_PID, GET_THIS_PID, OPEN, READ, SEEK, SEND_MESSAGE, SLEEP, SWITCH, WRITE
     }
 
     public enum Priority{
@@ -260,6 +260,108 @@ public class OS {
         currentCall = CallType.CLOSE;
 
         switchToKernel();
+    }
+
+    /**
+     * Gets the current process's PID.
+     * 
+     * @return The PID of the process.
+     */
+    public static int getPID(){
+        OS.dbMes("OS: Get PID");
+
+        parameters.clear();
+        
+        currentCall = CallType.GET_THIS_PID;
+
+        switchToKernel();
+
+        while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
+            try{
+                return (int) retval;
+            } catch (Exception e){
+                try{
+                    Thread.sleep(5);
+                } 
+                catch(Exception ex){
+
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets the PID of the named process.
+     * 
+     * @param name The name of the desired process.
+     * @return The PID of the named process, or -1 on failure.
+     */
+    public static int getPID(String name){
+        OS.dbMes("OS: Get PID of \"" + name + "\"");
+
+        parameters.clear();
+        parameters.add(name);
+
+        currentCall = CallType.GET_PID;
+
+        switchToKernel();
+
+        while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
+            try{
+                return (int) retval;
+            } catch (Exception e){
+                try{
+                    Thread.sleep(5);
+                } 
+                catch(Exception ex){
+
+                }
+            }
+        }
+    }
+
+    /**
+     * Sends a message to the desired process.
+     * 
+     * @param message The message to be sent.
+     */
+    public void sendMessage(Message message){
+        dbMes("OS: Send message: " + message.toString());
+
+        parameters.clear();
+        parameters.add(message);
+
+        currentCall = CallType.SEND_MESSAGE;
+
+        switchToKernel();
+    }
+
+    /**
+     * Pauses the process until it recives a message.
+     * 
+     * @return The most recent messge sent to the process.
+     */
+    public Message waitForMessage(){
+        dbMes("OS: Wait Message");
+
+        parameters.clear();
+
+        currentCall = CallType.GET_MESSAGE;
+
+        switchToKernel();
+
+        while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
+            try{
+                return (Message) retval;
+            } catch (Exception e){
+                try{
+                    Thread.sleep(5);
+                } 
+                catch(Exception ex){
+
+                }
+            }
+        }
     }
 
     // Helper Methods:

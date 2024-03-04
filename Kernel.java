@@ -44,6 +44,16 @@ public class Kernel implements Runnable{
                     createProcess(OS.parameters.get(0), OS.parameters.get(1));
                     break;
 
+                case GET_THIS_PID:
+                    dbMes("Get this PID");
+                    getThisPID();
+                    break;
+
+                case GET_PID:
+                    dbMes("GetPID");
+                    getPID(OS.parameters.get(0));
+                    break;
+
                 case SWITCH:
                     dbMes("Switch process");
                     switchProcess();
@@ -77,6 +87,16 @@ public class Kernel implements Runnable{
                 case CLOSE:
                     dbMes("Close");
                     close(OS.parameters.get(0));
+                    break;
+
+                case SEND_MESSAGE:
+                    dbMes("Send Message.");
+                    sendMessage(OS.parameters.get(0));
+                    break;
+                
+                case GET_MESSAGE:
+                    dbMes("Get Message.");
+                    getMessage();
                     break;
                 
                 default:
@@ -259,6 +279,44 @@ public class Kernel implements Runnable{
         else{
             dbMes("Object passed to Kernel.close() was not an integer.");
         }
+    }
+
+    /**
+     * Returns the PID of the currentlyRunning process.
+     */
+    public void getThisPID(){
+        OS.retval = scheduler.getCurrentlyRunning().getPID();
+    }
+
+    /**
+     * Returns the PID of the named process.
+     * 
+     * @param name The name of the desired Process.
+     */
+    public void getPID(Object name){
+
+        if(name instanceof String){
+            OS.retval = scheduler.getPID((String) name);
+        }
+        else{
+            OS.retval = -1;
+        }
+    }
+
+    /**
+     * Adds a message to the specified process.
+     * 
+     * @param message The message to be sent
+     */
+    public void sendMessage(Object message){
+        // TODO
+    }
+
+    /**
+     * Returns the first message in the process's message queue.
+     */
+    public void getMessage(){
+        // TODO
     }
 
     // Helper Methods:

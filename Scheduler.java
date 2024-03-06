@@ -1,11 +1,15 @@
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.time.Clock;
+import java.util.HashMap;
 
 public class Scheduler{
+
+    private HashMap<Integer, PCB> processMap;
 
     private PCB currentlyRunning;                   // The process that is currently running.
     private LinkedList<PCB> realTimeQ;              // The queueues of running prosesses.
@@ -26,6 +30,8 @@ public class Scheduler{
      * Constructor.
      */
     Scheduler(Kernel kernel){
+        this.processMap = new HashMap<Integer, PCB>();
+
         this.realTimeQ = new LinkedList<PCB>();
         this.interactiveQ = new LinkedList<PCB>();
         this.backgroundQ = new LinkedList<PCB>();
@@ -77,6 +83,8 @@ public class Scheduler{
         
         PCB newProcess = new PCB(up, priority);
 
+        processMap.put(newProcess.getPID(), newProcess);
+
         // If it is the first process, set it to currentlyRunning.
         if(currentlyRunning == null){
             currentlyRunning = newProcess;
@@ -117,6 +125,9 @@ public class Scheduler{
                     dbMes("Removed device.");
                     kernel.close(deviceIDs[i]);
                 }
+            
+            // Remove dead process from hashMap
+            processMap.remove(currentlyRunning.getPID());
         }
         
         // Get the next process in the queue and set it to currently running.
@@ -177,25 +188,8 @@ public class Scheduler{
      */
     public int getPID(String name){
 
-        // Check the realTimeProcesses for the process.
-        for(PCB pcb : realTimeQ)
-            if(pcb.getName().equals(name))
-                return pcb.getPID();
-        
-        // Check the interactive processes for the process.
-        for(PCB pcb : interactiveQ)
-            if(pcb.getName().equals(name))
-                return pcb.getPID();
-        
-        // Check the background processes for the process.
-        for(PCB pcb : backgroundQ)
-            if(pcb.getName().equals(name))
-                return pcb.getPID();
-        
-        // Check the sleeping processes for the process.
-        for(SleepingProcess sp: sleeping)
-            if(sp.getProcess().getName().equals(name))
-                return sp.getProcess().getPID();
+        for(Map<Integer, PCB>.entry(null, null))
+        // TODO : this
 
         return -1;
     }

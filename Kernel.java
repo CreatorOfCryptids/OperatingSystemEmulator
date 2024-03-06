@@ -44,12 +44,12 @@ public class Kernel implements Runnable{
                     createProcess(OS.parameters.get(0), OS.parameters.get(1));
                     break;
 
-                case GET_THIS_PID:
+                case GETPID:
                     dbMes("Get this PID");
                     getThisPID();
                     break;
 
-                case GET_PID:
+                case SEARCHPID:
                     dbMes("GetPID");
                     getPID(OS.parameters.get(0));
                     break;

@@ -8,7 +8,7 @@ public class OS {
     public static Object retval;                // The return value from the Kernel.
 
     public enum CallType{
-        CLOSE, CREATE, GET_MESSAGE, GET_PID, GET_THIS_PID, OPEN, READ, SEEK, SEND_MESSAGE, SLEEP, SWITCH, WRITE
+        CLOSE, CREATE, GET_MESSAGE, SEARCHPID, GETPID, OPEN, READ, SEEK, SEND_MESSAGE, SLEEP, SWITCH, WRITE
     }
 
     public enum Priority{
@@ -272,7 +272,7 @@ public class OS {
 
         parameters.clear();
         
-        currentCall = CallType.GET_THIS_PID;
+        currentCall = CallType.GETPID;
 
         switchToKernel();
 
@@ -283,9 +283,7 @@ public class OS {
                 try{
                     Thread.sleep(5);
                 } 
-                catch(Exception ex){
-
-                }
+                catch(InterruptedException ex){}
             }
         }
     }
@@ -296,13 +294,13 @@ public class OS {
      * @param name The name of the desired process.
      * @return The PID of the named process, or -1 on failure.
      */
-    public static int getPID(String name){
+    public static int searchPID(String name){
         OS.dbMes("OS: Get PID of \"" + name + "\"");
 
         parameters.clear();
         parameters.add(name);
 
-        currentCall = CallType.GET_PID;
+        currentCall = CallType.SEARCHPID;
 
         switchToKernel();
 
@@ -385,6 +383,6 @@ public class OS {
      * @param message The message printed to the terminal.
      */
     public static void dbMes(String message){
-        //System.out.println("    ||"+message);
+        System.out.println("    ||"+message);
     }
 }

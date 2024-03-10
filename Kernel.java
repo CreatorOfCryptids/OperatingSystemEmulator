@@ -322,8 +322,17 @@ public class Kernel implements Runnable{
     // Helper Methods:
 
     /**
-     * Stops the currently running process so the kernel can start.
+     * An accessor for the currentlyRuning PCB in scheduler.
+     * 
+     * @return The currentlyRunning PCB in schedueler
      */
+    public PCB getCurrentlyRunning(){
+        return scheduler.getCurrentlyRunning();
+    }
+
+    /**
+     * Stops the currently running process so the kernel can start.
+     *
     public void stopCurrentProcesss() {
         if (scheduler.getCurrentlyRunning() != null){
             dbMes("Stopping: " + scheduler.getCurrentlyRunning().getClass());
@@ -332,7 +341,7 @@ public class Kernel implements Runnable{
         else{
             dbMes("Current Process is null");
         }
-    }
+    }*/
     
     /**
      * DEBUGGING HELPER!!!

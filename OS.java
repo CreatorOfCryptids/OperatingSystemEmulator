@@ -370,9 +370,15 @@ public class OS {
     private static void switchToKernel(){
         dbMes("OS: Switching to kernel");
 
+        // Store the process here in case the kernel thread changes currentlyRunning before we can call stop.
+        PCB stopMe = kernel.getCurrentlyRunning();  
+
         kernel.start();
 
-        kernel.stopCurrentProcesss();
+        if(stopMe != null)
+            stopMe.stop();
+
+        //kernel.stopCurrentProcesss();
     }
     
     // Debugging Help:
@@ -383,6 +389,6 @@ public class OS {
      * @param message The message printed to the terminal.
      */
     public static void dbMes(String message){
-        System.out.println("    ||"+message);
+        //System.out.println("    ||"+message);
     }
 }

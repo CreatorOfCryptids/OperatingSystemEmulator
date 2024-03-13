@@ -309,7 +309,15 @@ public class Kernel implements Runnable{
      * @param message The message to be sent
      */
     public void sendMessage(Object message){
-        // TODO
+        if(message instanceof Message){
+            Message mes = new Message(scheduler.getCurrentlyRunning().getPID(), (Message) message);
+            if(!scheduler.sendMessage(mes)){
+                dbMes("Sending message failed.");
+            }
+        }
+        else{
+            dbMes("OS: Object passed to kernel is not a message.");
+        }
     }
 
     /**

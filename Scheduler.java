@@ -6,10 +6,11 @@ import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.time.Clock;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Scheduler{
 
-    private HashMap<Integer, PCB> processMap;
+    private HashMap<Integer, PCB> processMap;       // List of processes
 
     private PCB currentlyRunning;                   // The process that is currently running.
     private LinkedList<PCB> realTimeQ;              // The queueues of running prosesses.
@@ -17,6 +18,7 @@ public class Scheduler{
     private LinkedList<PCB> backgroundQ;
 
     private LinkedList<SleepingProcess> sleeping;   // The queueue of sleeping processes 
+    private LinkedList<PCB> awaitingMessage;        // The queueue of processes waiting for a message.
     private Clock clock;                            // Clock
 
     private Random rand;                            // The random number generator for the random 
@@ -188,10 +190,33 @@ public class Scheduler{
      */
     public int getPID(String name){
 
-        for(Map<Integer, PCB>.entry(null, null))
-        // TODO : this
+        for(Map.Entry<Integer, PCB> pcb: processMap.entrySet()){
+            if(pcb.getValue().getName().equals(name)){
+                dbMes("getPID(): Found process " + name);
+                return pcb.getKey();
+            }
+                
+        }
 
+        dbMes("getPID(): Process " + name + " not found");
         return -1;
+    }
+
+    /**
+     * Adds a message to the end of the targeted Process's queue and returns if successful.
+     * 
+     * @param mes The message to be sent
+     * @return True if sending was successful. False on failure.
+     */
+    public boolean sendMessage(Message mes) {
+        if(processMap.containsKey(mes.getTarget())){
+            processMap.get(mes.getTarget()).addMessage(mes);
+            
+            return true;
+        }
+        else{
+            return false;
+        }
     }
 
     // Helper Methods:

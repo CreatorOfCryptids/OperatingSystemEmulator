@@ -324,7 +324,7 @@ public class OS {
      * @param message The message to be sent.
      */
     public void sendMessage(Message message){
-        dbMes("OS: Send message: " + message.toString());
+        dbMes("OS: Send message: " + new String(message.getData()));
 
         parameters.clear();
         parameters.add(message);

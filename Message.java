@@ -27,8 +27,8 @@ public class Message {
      * 
      * @param mes The message to be coppied.
      */
-    Message(Message mes){
-        this.senderPID = mes.getSender();
+    Message(int senderPID, Message mes){
+        this.senderPID = senderPID;
         this.targetPID = mes.getTarget();
 
         this.signal = mes.getSignal();

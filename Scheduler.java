@@ -6,7 +6,6 @@ import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.time.Clock;
 import java.util.HashMap;
-import java.util.Map;
 
 public class Scheduler{
 
@@ -16,9 +15,11 @@ public class Scheduler{
     private LinkedList<PCB> realTimeQ;              // The queueues of running prosesses.
     private LinkedList<PCB> interactiveQ;   
     private LinkedList<PCB> backgroundQ;
+    
+    private HashMap<Integer, PCB> awaitingMessage;        // The queueue of processes waiting for a message.
 
     private LinkedList<SleepingProcess> sleeping;   // The queueue of sleeping processes 
-    private LinkedList<PCB> awaitingMessage;        // The queueue of processes waiting for a message.
+    
     private Clock clock;                            // Clock
 
     private Random rand;                            // The random number generator for the random 
@@ -37,6 +38,8 @@ public class Scheduler{
         this.realTimeQ = new LinkedList<PCB>();
         this.interactiveQ = new LinkedList<PCB>();
         this.backgroundQ = new LinkedList<PCB>();
+
+        awaitingMessage = new HashMap<Integer, PCB>();
 
         this.sleeping = new LinkedList<SleepingProcess>();
         this.clock = Clock.systemUTC();
@@ -209,14 +212,31 @@ public class Scheduler{
      * @return True if sending was successful. False on failure.
      */
     public boolean sendMessage(Message mes) {
+
+        dbMes("Sending message to PID: " + mes.getTarget() + " From PID: " + mes.getSender());
+
         if(processMap.containsKey(mes.getTarget())){
             processMap.get(mes.getTarget()).addMessage(mes);
-            
             return true;
         }
         else{
+            dbMes("ERROR: process " + mes.getTarget() + " does not exist.");
             return false;
         }
+    }
+
+    /**
+     * Removes the currentlyRunning process from the queue, and adds it to the awaitingMessages queue.
+     */
+    public void waitForMessage(){
+
+        dbMes("waitForMessage()");
+
+        awaitingMessage.put(currentlyRunning.getPID(), currentlyRunning);
+
+        currentlyRunning = getRandomQueue().removeFirst();
+
+        dbMes("currentlyRunning after waiting is: " + currentlyRunning.getName());
     }
 
     // Helper Methods:
@@ -300,14 +320,14 @@ public class Scheduler{
             this.process = process;
         }
 
-        /**
+        /** Not used, but here if we need it.
          * The getProcess() accessor.
          * 
          * @return The process in the SleepingProcess Wrapper.
-         */
+         *
         public PCB getProcess(){
             return process;
-        }
+        }*/
         
         /**
          * Accesses the time that this process should be woken up.

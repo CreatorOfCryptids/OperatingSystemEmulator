@@ -323,7 +323,7 @@ public class OS {
      * 
      * @param message The message to be sent.
      */
-    public void sendMessage(Message message){
+    public static void sendMessage(Message message){
         dbMes("OS: Send message: " + new String(message.getData()));
 
         parameters.clear();
@@ -339,7 +339,7 @@ public class OS {
      * 
      * @return The most recent messge sent to the process.
      */
-    public Message waitForMessage(){
+    public static Message waitForMessage(){
         dbMes("OS: Wait Message");
 
         parameters.clear();

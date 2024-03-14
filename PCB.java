@@ -199,6 +199,18 @@ public class PCB{
         messages.add(mes);
     }
 
+    /**
+     * Gets the first message in the message queue.
+     * 
+     * @return The first message in the message queue.
+     */
+    public Message getMessage(){
+        if(messages.isEmpty() == false)
+            return messages.removeFirst();
+        else
+            return null;
+    }
+
     // Debugging helper methods:
 
     /**

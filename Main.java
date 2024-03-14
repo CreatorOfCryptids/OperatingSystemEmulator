@@ -10,5 +10,8 @@ public class Main {
         OS.createProcess(new MereMortal(), OS.Priority.REALTIME);
         OS.createProcess(new MultiFIle(), OS.Priority.INTERACTIVE);
         OS.createProcess(new Reader(), OS.Priority.INTERACTIVE);
+
+        OS.createProcess(new Ping());
+        OS.createProcess(new Pong());
     }
 }

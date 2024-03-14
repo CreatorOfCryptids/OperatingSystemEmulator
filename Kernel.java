@@ -96,7 +96,7 @@ public class Kernel implements Runnable{
                 
                 case GET_MESSAGE:
                     dbMes("Get Message.");
-                    getMessage();
+                    waitForMessage();
                     break;
                 
                 default:
@@ -323,8 +323,12 @@ public class Kernel implements Runnable{
     /**
      * Returns the first message in the process's message queue.
      */
-    public void getMessage(){
-        // TODO
+    public void waitForMessage(){
+        Message retMessage = scheduler.getCurrentlyRunning().getMessage();
+        if(retMessage != null)
+            OS.retval = retMessage;
+        else 
+            scheduler.waitForMessage();
     }
 
     // Helper Methods:

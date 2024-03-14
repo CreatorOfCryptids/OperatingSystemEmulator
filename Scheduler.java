@@ -97,10 +97,10 @@ public class Scheduler{
             currentlyRunning = newProcess;
         }
         else{   // Otherwize, add it to the end of the queueue.
-            getCorrespondingQueue(priority).addLast(newProcess);
+            returnToQueue(newProcess);
         }
         
-        dbMes("Added process " + up.getClass() + ". There are " + getCorrespondingQueue(priority).size() + " processes in the " + priority.toString() + " queueue.");
+        dbMes("Added process " + up.getClass() + " to the " + priority.toString() + " queueue.");
         
         sem.release();
 
@@ -120,7 +120,7 @@ public class Scheduler{
         // Check if the currently Running process is still alive
         if (currentlyRunning.isDone() == false){   // If it is still running, move it to the end of the correct queueue.
             //dbMes("Case: Still alive.");
-            getCorrespondingQueue(currentlyRunning.getPriority()).addLast(currentlyRunning);
+            returnToQueue(currentlyRunning);
         }
         else{
             dbMes("Case: Someone died.");
@@ -175,13 +175,13 @@ public class Scheduler{
                     break;
                 }
             }
-            
+
             if(!inserted){
                 sleeping.add(sp);
             }
         }
 
-        dbMes("Sleeping queue: " + sleeping.toString());
+        //dbMes("Sleeping queue: " + sleeping.toString());
 
         substituteProcess();
     }
@@ -237,7 +237,7 @@ public class Scheduler{
             //dbMes("Adding message to " + noLongerWaiting.getName() + " Message queue size: " + noLongerWaiting.getMessagesSize());
             noLongerWaiting.addMessage(mes);
 
-            getCorrespondingQueue(noLongerWaiting.getPriority()).add(noLongerWaiting);
+            returnToQueue(noLongerWaiting);
 
             return true;
         }
@@ -276,7 +276,7 @@ public class Scheduler{
      * 
      * @param priority The priority level of the desired queue
      * @return The LinkedList that corresponds to the passed priority level
-     */
+     *
     private LinkedList<PCB> getCorrespondingQueue(OS.Priority priority){
 
         if(priority == OS.Priority.REALTIME)
@@ -289,6 +289,18 @@ public class Scheduler{
         else{
             dbMes("ERROR: Incorrect Priority");
             return backgroundQ;
+        }
+    }*/
+
+    private void returnToQueue(PCB returner){
+        if (returner.getPriority() == OS.Priority.REALTIME){
+            realTimeQ.add(returner);
+        }
+        else if (returner.getPriority() == OS.Priority.INTERACTIVE){
+            interactiveQ.add(returner);
+        }
+        else{
+            backgroundQ.add(returner);
         }
     }
 
@@ -405,9 +417,8 @@ public class Scheduler{
          */
         public boolean awaken(){
             if (this.wakeUpTime < clock.millis()){
-                LinkedList<PCB> q = getCorrespondingQueue(process.getPriority());
 
-                q.add(process);
+                returnToQueue(process);
 
                 dbMes("Waking up " + process.toString());
 

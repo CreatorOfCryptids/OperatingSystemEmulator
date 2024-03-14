@@ -139,8 +139,11 @@ public class Scheduler{
         currentlyRunning = getRandomQueue().removeFirst();
 
         // If the process is recived a message, add it to OS.retVal
-        if (currentlyRunning.getAwatingMessage())
+        if (currentlyRunning.getAwatingMessage()){
+            dbMes("Adding Message to OS.retVal");
             OS.retval = currentlyRunning.getMessage();
+        }
+            
 
         dbMes("currentlyRunning after switch: " + currentlyRunning.toString());
 
@@ -219,14 +222,28 @@ public class Scheduler{
 
         dbMes("Sending message to PID: " + mes.getTarget() + " From PID: " + mes.getSender());
 
+        // Check if the target process is waiting for a message.
         if(awaitingMessage.containsKey(mes.getTarget())){
+
+            dbMes("Found target in awaitingMessage Map.");
+
             PCB noLongerWaiting = awaitingMessage.remove(mes.getTarget());
+            noLongerWaiting.addMessage(mes);
+
             getCorrespondingQueue(noLongerWaiting.getPriority()).add(noLongerWaiting);
-        }
-        if(processMap.containsKey(mes.getTarget())){
-            processMap.get(mes.getTarget()).addMessage(mes);
+
             return true;
         }
+        // Otherwise look if the target process is not waiting
+        else if(processMap.containsKey(mes.getTarget())){
+
+            dbMes("Found target in processMap");
+
+            processMap.get(mes.getTarget()).addMessage(mes);
+
+            return true;
+        }
+        // If it doesn't exist, print error and return false.
         else{
             dbMes("ERROR: process " + mes.getTarget() + " does not exist.");
             return false;

@@ -309,14 +309,20 @@ public class Kernel implements Runnable{
      * @param message The message to be sent
      */
     public void sendMessage(Object message){
+
+        // Check inputs.
         if(message instanceof Message){
+
+            // Make copy of the message.
             Message mes = new Message(scheduler.getCurrentlyRunning().getPID(), (Message) message);
+
+            // Check if the message sent correctly, for debugging.
             if(!scheduler.sendMessage(mes)){
                 dbMes("Sending message failed.");
             }
         }
         else{
-            dbMes("OS: Object passed to kernel is not a message.");
+            dbMes("Object passed to kernel is not a message.");
         }
     }
 
@@ -325,10 +331,15 @@ public class Kernel implements Runnable{
      */
     public void waitForMessage(){
         Message retMessage = scheduler.getCurrentlyRunning().getMessage();
-        if(retMessage != null)
+        if(retMessage != null){
+            dbMes("Case: Already has message :)");
             OS.retval = retMessage;
-        else 
+        }
+        else {
+            dbMes("Case: Send into awaitingMessage.");
             scheduler.waitForMessage();
+        }
+            
     }
 
     // Helper Methods:

@@ -350,7 +350,8 @@ public class OS {
 
         while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
             try{
-                return (Message) retval;
+                if(retval != null)
+                    return (Message) retval;
             } catch (Exception e){
                 try{
                     Thread.sleep(5);
@@ -389,6 +390,6 @@ public class OS {
      * @param message The message printed to the terminal.
      */
     public static void dbMes(String message){
-        //System.out.println("    ||"+message);
+        System.out.println("    ||"+message);
     }
 }

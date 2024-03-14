@@ -9,6 +9,7 @@ public class PCB{
     private int timeouts;                   // The number of times that this ULP has gone to timeout.
     private int[] deviceIDs;                // The index of differnt Devices that this ULP has access to.
     private LinkedList<Message> messages;   // The queue of messages sent to this process.
+    private boolean awaitingMessage;
 
     /**
      * Constructor
@@ -22,6 +23,7 @@ public class PCB{
         this.pid = nextPID++;
         this.priority = priority;
         this.timeouts = 0;
+        this.awaitingMessage = false;
 
         this.deviceIDs = new int [10];
         for(int i=0; i<Device.DEVICE_COUNT;i++) {
@@ -202,13 +204,21 @@ public class PCB{
     /**
      * Gets the first message in the message queue.
      * 
-     * @return The first message in the message queue.
+     * @return The first message in the message queue, null if there isn't anything in the queue.
      */
     public Message getMessage(){
-        if(messages.isEmpty() == false)
+        if(messages.isEmpty() == false){
+            awaitingMessage = false;
             return messages.removeFirst();
-        else
+        }
+        else{
+            awaitingMessage = true;
             return null;
+        }
+    }
+
+    public boolean getAwatingMessage(){
+        return awaitingMessage;
     }
 
     // Debugging helper methods:

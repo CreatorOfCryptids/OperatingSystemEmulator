@@ -138,6 +138,10 @@ public class Scheduler{
         // Get the next process in the queue and set it to currently running.
         currentlyRunning = getRandomQueue().removeFirst();
 
+        // If the process is recived a message, add it to OS.retVal
+        if (currentlyRunning.getAwatingMessage())
+            OS.retval = currentlyRunning.getMessage();
+
         dbMes("currentlyRunning after switch: " + currentlyRunning.toString());
 
         sem.release();
@@ -215,6 +219,10 @@ public class Scheduler{
 
         dbMes("Sending message to PID: " + mes.getTarget() + " From PID: " + mes.getSender());
 
+        if(awaitingMessage.containsKey(mes.getTarget())){
+            PCB noLongerWaiting = awaitingMessage.remove(mes.getTarget());
+            getCorrespondingQueue(noLongerWaiting.getPriority()).add(noLongerWaiting);
+        }
         if(processMap.containsKey(mes.getTarget())){
             processMap.get(mes.getTarget()).addMessage(mes);
             return true;

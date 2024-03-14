@@ -9,17 +9,17 @@ import java.util.HashMap;
 
 public class Scheduler{
 
-    private HashMap<Integer, PCB> processMap;       // List of processes
+    
 
     private PCB currentlyRunning;                   // The process that is currently running.
     private LinkedList<PCB> realTimeQ;              // The queueues of running prosesses.
     private LinkedList<PCB> interactiveQ;   
     private LinkedList<PCB> backgroundQ;
-    
-    private HashMap<Integer, PCB> awaitingMessage;        // The queueue of processes waiting for a message.
+
+    private HashMap<Integer, PCB> processMap;       // List of processes
+    private HashMap<Integer, PCB> awaitingMessage;  // The list of processes waiting for a message.
 
     private LinkedList<SleepingProcess> sleeping;   // The queueue of sleeping processes 
-    
     private Clock clock;                            // Clock
 
     private Random rand;                            // The random number generator for the random 
@@ -61,11 +61,11 @@ public class Scheduler{
             dbMes("Interupt.                                    !!!");
             
             currentlyRunning.requestStop();
-            dbMes("Sleeping processes: "+sleeping.toString());
-            dbMes("AwaitingMessage: " + awaitingMessage.toString());
 
+            dbMes("Sleeping processes: "+sleeping.toString());
+
+            // Wake up any sleeping processes that should be awoken.
             while(sleeping.isEmpty() == false && sleeping.getFirst().awaken()){
-                
                 sleeping.removeFirst();
             }
                 
@@ -96,7 +96,7 @@ public class Scheduler{
         if(currentlyRunning == null){
             currentlyRunning = newProcess;
         }
-        else{   // Otherwize, add it to the end of the queueue.
+        else{   // Otherwize, add it to the end of the correct queueue.
             returnToQueue(newProcess);
         }
         
@@ -115,11 +115,11 @@ public class Scheduler{
         sem.acquireUninterruptibly();
 
         dbMes("Switching Process.");
-        //dbMes("currentlyRunning before switch: " + currentlyRunning.toString());
+        dbMes("currentlyRunning before switch: " + currentlyRunning.toString());
 
         // Check if the currently Running process is still alive
         if (currentlyRunning.isDone() == false){   // If it is still running, move it to the end of the correct queueue.
-            //dbMes("Case: Still alive.");
+            dbMes("Case: Still alive.");
             returnToQueue(currentlyRunning);
         }
         else{
@@ -137,10 +137,10 @@ public class Scheduler{
             processMap.remove(currentlyRunning.getPID());
         }
         
-        // Get the next process in the queue and set it to currently running.
+        // Get the next process in the queue and set it to currentlyRunning.
         currentlyRunning = getRandomQueue().removeFirst();
 
-        // If the process is recived a message, add it to OS.retVal
+        // If the process was waiting for a message, add it to OS.retVal so it can access the message.
         if (currentlyRunning.isWaitingForMessage())
             OS.retval = currentlyRunning.getMessage();
         
@@ -161,6 +161,7 @@ public class Scheduler{
         dbMes("Sleep");
         currentlyRunning.timeOutReset();
 
+        // Put it in a wrapper to keep track of when it should wake up.
         SleepingProcess sp = new SleepingProcess(currentlyRunning, miliseconds);
 
         if(sleeping.isEmpty()){
@@ -169,6 +170,7 @@ public class Scheduler{
         else{
             boolean inserted = false;
             for(int i=0; i<sleeping.size(); i++){
+                // Insert it before the first sleeping process that has a later wake up time than it.
                 if(sleeping.get(i).getWakeUpTime() >= sp.getWakeUpTime()){
                     sleeping.add(i, sp);
                     inserted = true;
@@ -176,12 +178,10 @@ public class Scheduler{
                 }
             }
 
-            if(!inserted){
+            if(!inserted){  // If there are no processes with a later wake up time, this won't happen in the loop.
                 sleeping.add(sp);
             }
         }
-
-        //dbMes("Sleeping queue: " + sleeping.toString());
 
         substituteProcess();
     }
@@ -205,12 +205,12 @@ public class Scheduler{
      */
     public int getPID(String name){
 
+        // look thru each process to see if it's name matches.
         for(Map.Entry<Integer, PCB> pcb: processMap.entrySet()){
             if(pcb.getValue().getName().equals(name)){
                 dbMes("getPID(): Found process " + name);
                 return pcb.getKey();
             }
-                
         }
 
         dbMes("getPID(): Process " + name + " not found");
@@ -230,13 +230,12 @@ public class Scheduler{
         // Check if the target process is waiting for a message.
         if(awaitingMessage.containsKey(mes.getTarget())){
 
-            //dbMes("Found target in awaitingMessage Map.");
-
+            dbMes("Found target in awaitingMessage Map.");
             PCB noLongerWaiting = awaitingMessage.remove(mes.getTarget());
 
-            //dbMes("Adding message to " + noLongerWaiting.getName() + " Message queue size: " + noLongerWaiting.getMessagesSize());
             noLongerWaiting.addMessage(mes);
 
+            // It's no longer waiting for a message, so add it back to the queues.
             returnToQueue(noLongerWaiting);
 
             return true;
@@ -244,7 +243,7 @@ public class Scheduler{
         // Otherwise look if the target process is not waiting
         else if(processMap.containsKey(mes.getTarget())){
 
-            //dbMes("Found target in processMap");
+            dbMes("Found target in processMap");
 
             processMap.get(mes.getTarget()).addMessage(mes);
 
@@ -258,11 +257,11 @@ public class Scheduler{
     }
 
     /**
-     * Removes the currentlyRunning process from the queue, and adds it to the awaitingMessages queue.
+     * Removes the currentlyRunning process from the queue, and adds it to the awaitingMessages map.
      */
-    public void waitForMessage(){
+    public void addToWaitMes(){
 
-        dbMes("waitForMessage()");
+        dbMes("addToWaitMes()");
 
         awaitingMessage.put(currentlyRunning.getPID(), currentlyRunning);
 
@@ -272,26 +271,10 @@ public class Scheduler{
     // Helper Methods:
 
     /**
-     * Returns the queue that corresponds to the given Priority level.
+     * Adds the process back into its correct queue.
      * 
-     * @param priority The priority level of the desired queue
-     * @return The LinkedList that corresponds to the passed priority level
-     *
-    private LinkedList<PCB> getCorrespondingQueue(OS.Priority priority){
-
-        if(priority == OS.Priority.REALTIME)
-            return realTimeQ;
-        else if (priority == OS.Priority.INTERACTIVE)
-            return interactiveQ;
-        else if (priority == OS.Priority.BACKGROUND){
-            return backgroundQ;
-        }
-        else{
-            dbMes("ERROR: Incorrect Priority");
-            return backgroundQ;
-        }
-    }*/
-
+     * @param returner The queue to be returned to its queue.
+     */
     private void returnToQueue(PCB returner){
         if (returner.getPriority() == OS.Priority.REALTIME){
             realTimeQ.add(returner);
@@ -310,42 +293,36 @@ public class Scheduler{
      * @return The queue that was randomly selected.
      */
     private LinkedList<PCB> getRandomQueue(){
+
         int qSelection = 0;
 
-        dbMes("RealTime contains: " + realTimeQ.toString());
-        dbMes("Interactive contains: " + interactiveQ.toString());
-        dbMes("Background contains: " + backgroundQ.toString());
-
+        // Only select queues that have processes in them
         if(realTimeQ.isEmpty() == false){
             qSelection = rand.nextInt(10);
         }
         else if(interactiveQ.isEmpty() == false){
             qSelection = rand.nextInt(4);
         }
-        else
+        else{
             qSelection = rand.nextInt(1);
+        }
         
         dbMes("Next Q: " + qSelection);
 
         if(qSelection >= 4){
-            //dbMes("NextQ RealTime");
             return realTimeQ;
         }
         else if(qSelection >=1){
             // We only check if this is empty if realTime is also empty. Checking here for safety.
-            if (interactiveQ.isEmpty() == false){
-                //dbMes("NextQ interactive");
-                
+            if (interactiveQ.isEmpty() == false){                
                 return interactiveQ;
             }
             else{
-                //dbMes("NextQ background");
-
+                // If intereactive is empty, default to background.
                 return backgroundQ;
             } 
         }
         else{
-            //dbMes("NextQ background");
             return backgroundQ;
         }
     }
@@ -361,13 +338,8 @@ public class Scheduler{
         currentlyRunning = getRandomQueue().removeFirst();
 
         // If the process is recived a message, add it to OS.retVal
-        if (currentlyRunning.isWaitingForMessage()){
-            //dbMes("Adding Message to OS.retVal");
+        if (currentlyRunning.isWaitingForMessage())
             OS.retval = currentlyRunning.getMessage();
-        }
-        else{
-            //dbMes("No new message.");
-        }
 
         dbMes("currentlyRunning after Substitution: " + currentlyRunning.toString());
 
@@ -391,15 +363,6 @@ public class Scheduler{
             this.wakeUpTime = clock.millis() + miliseconds;
             this.process = process;
         }
-
-        /** Not used, but here if we need it.
-         * The getProcess() accessor.
-         * 
-         * @return The process in the SleepingProcess Wrapper.
-         *
-        public PCB getProcess(){
-            return process;
-        }*/
         
         /**
          * Accesses the time that this process should be woken up.

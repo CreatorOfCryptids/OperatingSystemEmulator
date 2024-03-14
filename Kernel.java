@@ -39,19 +39,11 @@ public class Kernel implements Runnable{
 
             // Switch to correct function baced on current call.
             switch (OS.currentCall){
+
+                // Process Management:
                 case CREATE:
                     dbMes("Create Process");;
                     createProcess(OS.parameters.get(0), OS.parameters.get(1));
-                    break;
-
-                case GETPID:
-                    dbMes("Get this PID");
-                    getThisPID();
-                    break;
-
-                case SEARCHPID:
-                    dbMes("GetPID");
-                    getPID(OS.parameters.get(0));
                     break;
 
                 case SWITCH:
@@ -63,7 +55,8 @@ public class Kernel implements Runnable{
                     dbMes("Sleep");
                     sleep(OS.parameters.get(0));
                     break;
-
+                
+                // Device I/O Management:
                 case OPEN:
                     dbMes("Open");
                     open(OS.parameters.get(0));
@@ -89,12 +82,23 @@ public class Kernel implements Runnable{
                     close(OS.parameters.get(0));
                     break;
 
+                // Interprocess Communication Management
+                case GETPID:
+                    dbMes("Get this PID");
+                    getPID();
+                    break;
+
+                case SEARCHPID:
+                    dbMes("GetPID");
+                    searchPID(OS.parameters.get(0));
+                    break;
+
                 case SEND_MESSAGE:
                     dbMes("Send Message.");
                     sendMessage(OS.parameters.get(0));
                     break;
                 
-                case GET_MESSAGE:
+                case WAIT_MESSAGE:
                     dbMes("Get Message.");
                     waitForMessage();
                     break;
@@ -284,7 +288,7 @@ public class Kernel implements Runnable{
     /**
      * Returns the PID of the currentlyRunning process.
      */
-    public void getThisPID(){
+    public void getPID(){
         OS.retval = scheduler.getCurrentlyRunning().getPID();
     }
 
@@ -293,8 +297,9 @@ public class Kernel implements Runnable{
      * 
      * @param name The name of the desired Process.
      */
-    public void getPID(Object name){
+    public void searchPID(Object name){
 
+        // Check inputs
         if(name instanceof String){
             OS.retval = scheduler.getPID((String) name);
         }
@@ -330,14 +335,16 @@ public class Kernel implements Runnable{
      * Returns the first message in the process's message queue.
      */
     public void waitForMessage(){
+
         Message retMessage = scheduler.getCurrentlyRunning().getMessage();
+
         if(retMessage != null){
             dbMes("Case: Already has message :)");
             OS.retval = retMessage;
         }
         else {
             dbMes("Case: Send into awaitingMessage.");
-            scheduler.waitForMessage();
+            scheduler.addToWaitMes();
         }
             
     }
@@ -352,19 +359,6 @@ public class Kernel implements Runnable{
     public PCB getCurrentlyRunning(){
         return scheduler.getCurrentlyRunning();
     }
-
-    /**
-     * Stops the currently running process so the kernel can start.
-     *
-    public void stopCurrentProcesss() {
-        if (scheduler.getCurrentlyRunning() != null){
-            dbMes("Stopping: " + scheduler.getCurrentlyRunning().getClass());
-            scheduler.getCurrentlyRunning().stop();
-        }
-        else{
-            dbMes("Current Process is null");
-        }
-    }*/
     
     /**
      * DEBUGGING HELPER!!!

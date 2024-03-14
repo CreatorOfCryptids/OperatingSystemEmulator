@@ -8,7 +8,7 @@ public class OS {
     public static Object retval;                // The return value from the Kernel.
 
     public enum CallType{
-        CLOSE, CREATE, GET_MESSAGE, SEARCHPID, GETPID, OPEN, READ, SEEK, SEND_MESSAGE, SLEEP, SWITCH, WRITE
+        CLOSE, CREATE, SEARCHPID, GETPID, OPEN, READ, SEEK, SEND_MESSAGE, SLEEP, SWITCH, WAIT_MESSAGE, WRITE
     }
 
     public enum Priority{
@@ -344,7 +344,7 @@ public class OS {
 
         parameters.clear();
 
-        currentCall = CallType.GET_MESSAGE;
+        currentCall = CallType.WAIT_MESSAGE;
 
         switchToKernel();
 

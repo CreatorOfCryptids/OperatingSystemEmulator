@@ -4,10 +4,13 @@ public class PCB{
     
     private static int nextPID = 0;         // Stores the number of PCBs.
     private int pid;                        // This PCB's PID.
+
     private UserLandProcess ulp;            // The ULP under this PCB's control
     private OS.Priority priority;           // The ULP's priority.
     private int timeouts;                   // The number of times that this ULP has gone to timeout.
+
     private int[] deviceIDs;                // The index of differnt Devices that this ULP has access to.
+
     private LinkedList<Message> messages;   // The queue of messages sent to this process.
     private boolean awaitingMessage;
 
@@ -23,7 +26,6 @@ public class PCB{
         this.pid = nextPID++;
         this.priority = priority;
         this.timeouts = 0;
-        this.awaitingMessage = false;
 
         this.deviceIDs = new int [10];
         for(int i=0; i<Device.DEVICE_COUNT;i++) {
@@ -31,6 +33,7 @@ public class PCB{
         }
 
         this.messages = new LinkedList<Message>();
+        this.awaitingMessage = false;
     }
 
     // Interfacing with the USP:
@@ -217,11 +220,25 @@ public class PCB{
         }
     }
 
-    public boolean getAwatingMessage(){
+    /**
+     * Accessor for awaitingMessage.
+     * 
+     * @return True, if this PCB is expecting a message. False if not.
+     */
+    public boolean isWaitingForMessage(){
         return awaitingMessage;
     }
 
     // Debugging helper methods:
+
+    /**
+     * Accessor for the size of the messages queue.
+     * 
+     * @return The size of the messages queue.
+     */
+    public int getMessagesSize(){
+        return messages.size();
+    }
 
     /**
      * DEBUGGING HELPER!

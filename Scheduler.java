@@ -139,11 +139,10 @@ public class Scheduler{
         currentlyRunning = getRandomQueue().removeFirst();
 
         // If the process is recived a message, add it to OS.retVal
-        if (currentlyRunning.getAwatingMessage()){
+        if (currentlyRunning.isWaitingForMessage()){
             dbMes("Adding Message to OS.retVal");
             OS.retval = currentlyRunning.getMessage();
         }
-            
 
         dbMes("currentlyRunning after switch: " + currentlyRunning.toString());
 
@@ -178,7 +177,9 @@ public class Scheduler{
 
         dbMes("Sleeping has " + sleeping.size() + " members in the queue: " + sleeping.toString());
 
-        currentlyRunning = getRandomQueue().removeFirst();
+        substituteProcess();
+
+        switchProcess();
     }
 
     // Accessors:
@@ -228,6 +229,8 @@ public class Scheduler{
             dbMes("Found target in awaitingMessage Map.");
 
             PCB noLongerWaiting = awaitingMessage.remove(mes.getTarget());
+
+            dbMes("Adding message to " + noLongerWaiting.getName() + " Message queue size: " + noLongerWaiting.getMessagesSize());
             noLongerWaiting.addMessage(mes);
 
             getCorrespondingQueue(noLongerWaiting.getPriority()).add(noLongerWaiting);
@@ -260,6 +263,8 @@ public class Scheduler{
         awaitingMessage.put(currentlyRunning.getPID(), currentlyRunning);
 
         currentlyRunning = getRandomQueue().removeFirst();
+
+        substituteProcess();
 
         dbMes("currentlyRunning after waiting is: " + currentlyRunning.getName());
     }
@@ -324,6 +329,26 @@ public class Scheduler{
             dbMes("NextQ background");
             return backgroundQ;
         }
+    }
+
+    /**
+     * Replaces currentlyRunning safely without adding the old process back into the queues.
+     */
+    private void substituteProcess(){
+
+        dbMes("Substituting Process.");
+
+        // Get the next process in the queue and set it to currently running.
+        currentlyRunning = getRandomQueue().removeFirst();
+
+        // If the process is recived a message, add it to OS.retVal
+        if (currentlyRunning.isWaitingForMessage()){
+            dbMes("Adding Message to OS.retVal");
+            OS.retval = currentlyRunning.getMessage();
+        }
+
+        dbMes("currentlyRunning after Substitution: " + currentlyRunning.toString());
+
     }
 
     /**

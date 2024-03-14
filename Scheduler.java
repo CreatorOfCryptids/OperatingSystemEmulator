@@ -58,12 +58,14 @@ public class Scheduler{
      */
     private class Interupt extends TimerTask{
         public void run(){
-            dbMes("Interupt.");
+            dbMes("Interupt.                                    !!!");
             
             currentlyRunning.requestStop();
+            dbMes("Sleeping processes: "+sleeping.toString());
+            dbMes("AwaitingMessage: " + awaitingMessage.toString());
 
             while(sleeping.isEmpty() == false && sleeping.getFirst().awaken()){
-                dbMes(sleeping.toString());
+                
                 sleeping.removeFirst();
             }
                 
@@ -113,11 +115,11 @@ public class Scheduler{
         sem.acquireUninterruptibly();
 
         dbMes("Switching Process.");
-        dbMes("currentlyRunning before switch: " + currentlyRunning.toString());
+        //dbMes("currentlyRunning before switch: " + currentlyRunning.toString());
 
         // Check if the currently Running process is still alive
         if (currentlyRunning.isDone() == false){   // If it is still running, move it to the end of the correct queueue.
-            dbMes("Case: Still alive.");
+            //dbMes("Case: Still alive.");
             getCorrespondingQueue(currentlyRunning.getPriority()).addLast(currentlyRunning);
         }
         else{
@@ -139,11 +141,9 @@ public class Scheduler{
         currentlyRunning = getRandomQueue().removeFirst();
 
         // If the process is recived a message, add it to OS.retVal
-        if (currentlyRunning.isWaitingForMessage()){
-            dbMes("Adding Message to OS.retVal");
+        if (currentlyRunning.isWaitingForMessage())
             OS.retval = currentlyRunning.getMessage();
-        }
-
+        
         dbMes("currentlyRunning after switch: " + currentlyRunning.toString());
 
         sem.release();
@@ -167,19 +167,23 @@ public class Scheduler{
             sleeping.add(sp);
         }
         else{
+            boolean inserted = false;
             for(int i=0; i<sleeping.size(); i++){
-                if(sleeping.get(i).getWakeUpTime() < sp.getWakeUpTime()){
-                    sleeping.add(i+1, sp);
+                if(sleeping.get(i).getWakeUpTime() >= sp.getWakeUpTime()){
+                    sleeping.add(i, sp);
+                    inserted = true;
                     break;
                 }
             }
+            
+            if(!inserted){
+                sleeping.add(sp);
+            }
         }
 
-        dbMes("Sleeping has " + sleeping.size() + " members in the queue: " + sleeping.toString());
+        dbMes("Sleeping queue: " + sleeping.toString());
 
         substituteProcess();
-
-        switchProcess();
     }
 
     // Accessors:
@@ -226,11 +230,11 @@ public class Scheduler{
         // Check if the target process is waiting for a message.
         if(awaitingMessage.containsKey(mes.getTarget())){
 
-            dbMes("Found target in awaitingMessage Map.");
+            //dbMes("Found target in awaitingMessage Map.");
 
             PCB noLongerWaiting = awaitingMessage.remove(mes.getTarget());
 
-            dbMes("Adding message to " + noLongerWaiting.getName() + " Message queue size: " + noLongerWaiting.getMessagesSize());
+            //dbMes("Adding message to " + noLongerWaiting.getName() + " Message queue size: " + noLongerWaiting.getMessagesSize());
             noLongerWaiting.addMessage(mes);
 
             getCorrespondingQueue(noLongerWaiting.getPriority()).add(noLongerWaiting);
@@ -240,7 +244,7 @@ public class Scheduler{
         // Otherwise look if the target process is not waiting
         else if(processMap.containsKey(mes.getTarget())){
 
-            dbMes("Found target in processMap");
+            //dbMes("Found target in processMap");
 
             processMap.get(mes.getTarget()).addMessage(mes);
 
@@ -262,11 +266,7 @@ public class Scheduler{
 
         awaitingMessage.put(currentlyRunning.getPID(), currentlyRunning);
 
-        currentlyRunning = getRandomQueue().removeFirst();
-
         substituteProcess();
-
-        dbMes("currentlyRunning after waiting is: " + currentlyRunning.getName());
     }
 
     // Helper Methods:
@@ -278,6 +278,7 @@ public class Scheduler{
      * @return The LinkedList that corresponds to the passed priority level
      */
     private LinkedList<PCB> getCorrespondingQueue(OS.Priority priority){
+
         if(priority == OS.Priority.REALTIME)
             return realTimeQ;
         else if (priority == OS.Priority.INTERACTIVE)
@@ -299,6 +300,10 @@ public class Scheduler{
     private LinkedList<PCB> getRandomQueue(){
         int qSelection = 0;
 
+        dbMes("RealTime contains: " + realTimeQ.toString());
+        dbMes("Interactive contains: " + interactiveQ.toString());
+        dbMes("Background contains: " + backgroundQ.toString());
+
         if(realTimeQ.isEmpty() == false){
             qSelection = rand.nextInt(10);
         }
@@ -311,22 +316,24 @@ public class Scheduler{
         dbMes("Next Q: " + qSelection);
 
         if(qSelection >= 4){
-            dbMes("NextQ RealTime");
+            //dbMes("NextQ RealTime");
             return realTimeQ;
         }
         else if(qSelection >=1){
             // We only check if this is empty if realTime is also empty. Checking here for safety.
             if (interactiveQ.isEmpty() == false){
-                dbMes("NextQ interactive");
+                //dbMes("NextQ interactive");
+                
                 return interactiveQ;
             }
             else{
-                dbMes("NextQ background");
+                //dbMes("NextQ background");
+
                 return backgroundQ;
             } 
         }
         else{
-            dbMes("NextQ background");
+            //dbMes("NextQ background");
             return backgroundQ;
         }
     }
@@ -343,8 +350,11 @@ public class Scheduler{
 
         // If the process is recived a message, add it to OS.retVal
         if (currentlyRunning.isWaitingForMessage()){
-            dbMes("Adding Message to OS.retVal");
+            //dbMes("Adding Message to OS.retVal");
             OS.retval = currentlyRunning.getMessage();
+        }
+        else{
+            //dbMes("No new message.");
         }
 
         dbMes("currentlyRunning after Substitution: " + currentlyRunning.toString());

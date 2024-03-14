@@ -201,6 +201,7 @@ public class PCB{
      * @param mes The new message.
      */
     public void addMessage(Message mes){
+        dbMes("New message added.");
         messages.add(mes);
     }
 
@@ -210,11 +211,14 @@ public class PCB{
      * @return The first message in the message queue, null if there isn't anything in the queue.
      */
     public Message getMessage(){
+
         if(messages.isEmpty() == false){
+            dbMes("Messages is not empty");
             awaitingMessage = false;
             return messages.removeFirst();
         }
         else{
+            dbMes("Messages is empty :(");
             awaitingMessage = true;
             return null;
         }
@@ -232,7 +236,7 @@ public class PCB{
     // Debugging helper methods:
 
     /**
-     * Accessor for the size of the messages queue.
+     * DEBUGGING HELPER!!! Accessor for the size of the messages queue.
      * 
      * @return The size of the messages queue.
      */
@@ -241,7 +245,7 @@ public class PCB{
     }
 
     /**
-     * DEBUGGING HELPER!
+     * DEBUGGING HELPER!!!
      * 
      * @return A String containing the name of the ULP.
      */
@@ -250,11 +254,11 @@ public class PCB{
     }
 
     /**
-     * DEBUGGING HELPER!
+     * DEBUGGING HELPER!!!
      * 
      * @param Message
      */
     private void dbMes(String Message){
-        OS.dbMes("||PCB (" + ulp.getClass() + "): " + Message);
+        //OS.dbMes("||PCB (" + ulp.getClass() + "): " + Message);
     }
 }

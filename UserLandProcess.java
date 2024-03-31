@@ -98,34 +98,68 @@ abstract class UserLandProcess implements Runnable{
         }
     }
 
+    /**
+     * Reads data from memory.
+     * 
+     * @param address The address to be read.
+     * @return The memory in said address, or -1 on failure.
+     */
     public byte read(int address){
+        dbMes("Read");
+        int mapping = getPhysicalAddress(address);
+        if (mapping != -1){
+            return memory[mapping];
+        }
+        else return -1;
+
+    }
+
+    /**
+     * Writes data to memory.
+     * 
+     * @param address The address to be writen to.
+     * @param value The value to be writen.
+     */
+    public void write(int address, byte value){
+        dbMes("Write");
+
+        int mapping = getPhysicalAddress(address);
+        if (mapping != -1){
+            memory[mapping] = value;
+        }
+
+    }
+
+    /**
+     * Helper Method: Gets the physical address from the procvided virtual address.
+     * 
+     * @param address The desired virtal address in memory.
+     * @return The physical address of the specified virtal memory address.
+     */
+    private int getPhysicalAddress(int address){
+
         int page = address / 1024;
         int offset = address % 1024;
         
         if (tlb[0][0] == page){
-            return memory[tlb[0][1] * PAGE_SIZE + offset];
+            return tlb[0][1] * PAGE_SIZE + offset;
         }
         else if (tlb[1][0] == page){
-            return memory[tlb[1][1] * PAGE_SIZE + offset];
+            return tlb[1][1] * PAGE_SIZE + offset;
         }
         
         OS.getMapping(page);
 
         if (tlb[0][0] == page){
-            return memory[tlb[0][1] * PAGE_SIZE + offset];
+            return tlb[0][1] * PAGE_SIZE + offset;
         }
         else if (tlb[1][0] == page){
-            return memory[tlb[1][1] * PAGE_SIZE + offset];
+            return tlb[1][1] * PAGE_SIZE + offset;
         }
         else{
-            dbMes("Read(): Didn't find page address after calling OS.getMapping("+page+").");
+            dbMes("getPhysicalMapping(): Didn't find page address after calling OS.getMapping(" + page + ").");
             return -1;
         }
-    }
-
-    public void write(int address, byte value){
-        int page = address / 1024;
-        int offset = address % 1024;
     }
 
     /**

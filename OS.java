@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Random;
 
 public class OS {
     
@@ -360,6 +361,25 @@ public class OS {
 
                 }
             }
+        }
+    }
+
+    public static void getMapping(int virtualPageNum){
+        dbMes("OS: Get Mapping");
+
+        Random rand = new Random();
+        int tlbIndex = rand.nextInt(2);
+
+        // Make sure the ULP is asking for a valid section of memory.
+        if (virtualPageNum >= 0 && virtualPageNum <UserLandProcess.PAGE_COUNT){
+            UserLandProcess.tlb[tlbIndex][0] = virtualPageNum;
+            UserLandProcess.tlb[tlbIndex][1] = kernel.getCurrentlyRunning().getMemoryMapping(virtualPageNum);
+        }
+        // If it's out of bounds, return failure.
+        else{
+            UserLandProcess.tlb[tlbIndex][0] = virtualPageNum;
+            UserLandProcess.tlb[tlbIndex][1] = -1;
+            dbMes("OS: getMapping(): Virtual Page Number " + virtualPageNum + " out of bounds.");
         }
     }
 

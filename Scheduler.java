@@ -9,8 +9,6 @@ import java.util.HashMap;
 
 public class Scheduler{
 
-    
-
     private PCB currentlyRunning;                   // The process that is currently running.
     private LinkedList<PCB> realTimeQ;              // The queueues of running prosesses.
     private LinkedList<PCB> interactiveQ;   
@@ -133,7 +131,7 @@ public class Scheduler{
                     kernel.close(deviceIDs[i]);
                 }
             
-            // Remove dead process from hashMap
+            // Remove dead process from HashMap
             processMap.remove(currentlyRunning.getPID());
         }
         

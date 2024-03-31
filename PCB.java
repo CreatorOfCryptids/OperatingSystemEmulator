@@ -4,12 +4,14 @@ public class PCB{
     
     private static int nextPID = 0;         // Stores the number of PCBs.
     private int pid;                        // This PCB's PID.
+    private static final int MEM_MAP_SIZE = 100;
 
     private UserLandProcess ulp;            // The ULP under this PCB's control
     private OS.Priority priority;           // The ULP's priority.
     private int timeouts;                   // The number of times that this ULP has gone to timeout.
 
     private int[] deviceIDs;                // The index of differnt Devices that this ULP has access to.
+    private int[] memoryMap;                // Stores this processes data. The index is the spot in virual memeory, and the value is the physical address.
 
     private LinkedList<Message> messages;   // The queue of messages sent to this process.
     private boolean awaitingMessage;
@@ -27,16 +29,21 @@ public class PCB{
         this.priority = priority;
         this.timeouts = 0;
 
-        this.deviceIDs = new int [10];
+        this.deviceIDs = new int [Device.DEVICE_COUNT];
         for(int i=0; i<Device.DEVICE_COUNT;i++) {
             deviceIDs[i] = -1;
+        }
+
+        this.memoryMap = new int[MEM_MAP_SIZE];
+        for(int i=0; i<MEM_MAP_SIZE; i++){
+            memoryMap[i] = -1;
         }
 
         this.messages = new LinkedList<Message>();
         this.awaitingMessage = false;
     }
 
-    // Interfacing with the USP:
+    // Interfacing with the ULP:
 
     /**
      * Calls request stop on the ULP.
@@ -195,6 +202,8 @@ public class PCB{
         return deviceIDs;
     }
 
+    // Message Mangagement:
+
     /**
      * Adds a new message to this process's message queue.
      * 
@@ -231,6 +240,12 @@ public class PCB{
      */
     public boolean isWaitingForMessage(){
         return awaitingMessage;
+    }
+
+    // Memory Management:
+
+    public int getMemoryMapping(int virtualPageNum){
+        return memoryMap[virtualPageNum];
     }
 
     // Debugging helper methods:

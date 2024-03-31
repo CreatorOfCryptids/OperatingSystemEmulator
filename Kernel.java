@@ -6,6 +6,7 @@ public class Kernel implements Runnable{
     private Semaphore sem;
     private Scheduler scheduler;
     private VFS vfs;
+    private boolean[] freeMemMap;
 
     /**
      * Constructor.
@@ -15,6 +16,10 @@ public class Kernel implements Runnable{
         sem = new Semaphore(0);
         scheduler = new Scheduler(this);
         vfs = new VFS();
+
+        freeMemMap = new boolean[UserLandProcess.PAGE_COUNT];
+        for(int i = 0; i<UserLandProcess.PAGE_COUNT; i++)
+            freeMemMap[i] = true;
         
         thread.start();
     }

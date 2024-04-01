@@ -1,10 +1,11 @@
 import java.util.concurrent.Semaphore;
 
 abstract class UserLandProcess implements Runnable{
+
     public static final int PAGE_SIZE = 1024;
     public static final int PAGE_COUNT = 1024;
     public static final int MEM_SIZE = PAGE_COUNT*PAGE_SIZE;   // 1024 Pages with 1024 bytes each.
-    public static int[][] tlb = new int[2][2];      // [Virtual][Physical]
+    public static int[][] tlb = new int[2][2];      // [][0 = Virtual, 1 = Physical]
     
     public static byte[] memory = new byte[MEM_SIZE];    // Virtual memory.
 
@@ -129,6 +130,37 @@ abstract class UserLandProcess implements Runnable{
         }
 
     }
+
+    /** Thought I would need this. I was wrong.
+     * Allocates memory for this process.
+     * 
+     * @param size The amount of memory to be allocated. MUST BE A MULTIPLE OF 1024!
+     * @return The pointer of the allocated memory, or -1 on failure.
+     */
+    public int allocateMemory(int size){
+
+        if (size % PAGE_SIZE != 0){
+            return -1;
+        }
+
+        return OS.allocateMemory(size);
+    }
+    
+    /**
+     * Frees the specifed place in memory.
+     * 
+     * @param pointer The start of the section of memory to be freed. MUST BE A MULTIPLE OF 1024!
+     * @param size The amount of memory to be freed. MUST BE A MULTIPLE OF 1024!
+     * @return True if the memory was freed. False on error.
+     */
+    public boolean freeMemory(int pointer, int size){
+
+        if (pointer % PAGE_SIZE != 0 && size % PAGE_SIZE !=0){
+            return false;
+        }
+
+        return OS.freeMemory(pointer, size);
+    }/**/
 
     /**
      * Helper Method: Gets the physical address from the procvided virtual address.

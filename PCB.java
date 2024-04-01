@@ -244,8 +244,42 @@ public class PCB{
 
     // Memory Management:
 
+    /**
+     * Returns the physical address of the provided virtualPageNumber.
+     * 
+     * @param virtualPageNum The virtual pointer that corresponds to a phycical address in memory.
+     * @return The physical address of the virtual pointer, or -1 on failure.
+     */
     public int getMemoryMapping(int virtualPageNum){
         return memoryMap[virtualPageNum];
+    }
+
+    /**
+     * Creates a virtual memory mapping for a physical page address.
+     * 
+     * @param physicalAddress The address for the start of the allocated physical page.
+     * @return The virtual memory address, or -1 on failure.
+     */
+    public int allocateMemory(int physicalAddress){
+        // Find first empty entry.
+        for(int i=0; i<MEM_MAP_SIZE; i++){
+            if (memoryMap[i] == -1){
+                // Store the physical address in the correct spot, and return the virtual memory address.
+                memoryMap[i] = physicalAddress;
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * The getMemoryMapping() accessor.
+     * 
+     * @return The memoryMap of this PCB.
+     */
+    public int[] getMemoryMapping(){
+        return memoryMap;
     }
 
     // Debugging helper methods:

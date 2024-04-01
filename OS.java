@@ -402,8 +402,11 @@ public class OS {
             return -1;
         }
 
-        parameters.clear();
+        // Change to number of pages added because we don't support removing anything smaller anyway.
+        size = size / UserLandProcess.PAGE_SIZE;
 
+        parameters.clear();
+        
         parameters.add(size);
 
         currentCall = CallType.ALLOCATE;
@@ -440,11 +443,17 @@ public class OS {
             dbMes("OS: Size " + pointer + " is not a multiple of " + UserLandProcess.PAGE_SIZE + ".");
             return false;
         }
-        
+
         if(size % UserLandProcess.PAGE_SIZE !=0){
             dbMes("OS: Size " + size + " is not a multiple of " + UserLandProcess.PAGE_SIZE + ".");
             return false;
         }
+
+        // Change to page number because we don't support removeing anything smaller than a page.
+        pointer = pointer / UserLandProcess.PAGE_SIZE;
+
+        // Change to number of pages added because we don't support removing anything smaller anyway.
+        size = size / UserLandProcess.PAGE_SIZE;
 
         parameters.clear();
 

@@ -9,7 +9,7 @@ public class OS {
     public static Object retval;                // The return value from the Kernel.
 
     public enum CallType{
-        CLOSE, CREATE, SEARCHPID, GETPID, OPEN, READ, SEEK, SEND_MESSAGE, SLEEP, SWITCH, WAIT_MESSAGE, WRITE
+        ALLOCATE, CLOSE, CREATE, FREE, SEARCHPID, GETPID, OPEN, READ, SEEK, SEND_MESSAGE, SLEEP, SWITCH, WAIT_MESSAGE, WRITE
     }
 
     public enum Priority{
@@ -364,6 +364,11 @@ public class OS {
         }
     }
 
+    /**
+     * Gets the mapping for the provided virutal page number, and stores it into the tlp.
+     * 
+     * @param virtualPageNum The virtual page number of the desired memory or -1 on failure.
+     */
     public static void getMapping(int virtualPageNum){
         dbMes("OS: Get Mapping");
 
@@ -381,6 +386,74 @@ public class OS {
             UserLandProcess.tlb[tlbIndex][1] = -1;
             dbMes("OS: getMapping(): Virtual Page Number " + virtualPageNum + " out of bounds.");
         }
+    }
+
+    /**
+     * Allocates memory.
+     * 
+     * @param size The amount of memeory to be allocated.
+     * @return The first pointer in the allocated memory.
+     */
+    public static int allocateMemory(int size){
+        dbMes("OS: Allocate Memory");
+
+        parameters.clear();
+
+        parameters.add(size);
+
+        currentCall = CallType.ALLOCATE;
+
+        switchToKernel();
+
+        while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
+            try{
+                if(retval != null)
+                    return (int) retval;
+            } catch (Exception e){
+                try{
+                    Thread.sleep(5);
+                } 
+                catch(Exception ex){
+
+                }
+            }
+        }
+    }
+
+    /**
+     * Frees the specified page in memory.
+     * 
+     * @param pointer The start of the addresses in memory to be freed.
+     * @param size The amound of pages to be freed in memory.
+     * 
+     * @return True if the freeing was successfull. False otherwize.
+     */
+    public static boolean freeMemory(int pointer, int size){
+        dbMes("OS: Allocate Memory");
+
+        parameters.clear();
+
+        parameters.add(pointer);
+        parameters.add(size);
+
+        currentCall = CallType.FREE;
+
+        switchToKernel();
+
+        while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
+            try{
+                if(retval != null)
+                    return (boolean) retval;
+            } catch (Exception e){
+                try{
+                    Thread.sleep(5);
+                } 
+                catch(Exception ex){
+
+                }
+            }
+        }
+    
     }
 
     // Helper Methods:

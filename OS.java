@@ -397,6 +397,11 @@ public class OS {
     public static int allocateMemory(int size){
         dbMes("OS: Allocate Memory");
 
+        if(size % UserLandProcess.PAGE_SIZE !=0){
+            dbMes("OS: Size " + size + " is not a multiple of " + UserLandProcess.PAGE_SIZE + ".");
+            return -1;
+        }
+
         parameters.clear();
 
         parameters.add(size);
@@ -430,6 +435,16 @@ public class OS {
      */
     public static boolean freeMemory(int pointer, int size){
         dbMes("OS: Allocate Memory");
+
+        if(pointer % UserLandProcess.PAGE_SIZE !=0){
+            dbMes("OS: Size " + pointer + " is not a multiple of " + UserLandProcess.PAGE_SIZE + ".");
+            return false;
+        }
+        
+        if(size % UserLandProcess.PAGE_SIZE !=0){
+            dbMes("OS: Size " + size + " is not a multiple of " + UserLandProcess.PAGE_SIZE + ".");
+            return false;
+        }
 
         parameters.clear();
 

@@ -5,7 +5,7 @@ abstract class UserLandProcess implements Runnable{
     public static final int PAGE_SIZE = 1024;
     public static final int PAGE_COUNT = 1024;
     public static final int MEM_SIZE = PAGE_COUNT*PAGE_SIZE;   // 1024 Pages with 1024 bytes each.
-    public static int[][] tlb = new int[2][2];      // [][0 = Virtual, 1 = Physical]
+    public static int[][] tlb = new int[][]{{-1,-1},{-1,-1}};      // [][0 = Virtual, 1 = Physical]
     
     public static byte[] memory = new byte[MEM_SIZE];    // Virtual memory.
 

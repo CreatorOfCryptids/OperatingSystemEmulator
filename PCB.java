@@ -260,17 +260,51 @@ public class PCB{
      * @param physicalAddress The address for the start of the allocated physical page.
      * @return The virtual memory address, or -1 on failure.
      */
-    public int allocateMemory(int physicalAddress){
-        // Find first empty entry.
-        for(int i=0; i<MEM_MAP_SIZE; i++){
+    public int allocateMemory(int[] physicalAddresses){
+        // Find empty memory with enough space.
+        int index = -1;
+
+        // Loop looking for a sequence of empty entries
+        for(int i=0; i<MEM_MAP_SIZE - physicalAddresses.length; i++){   // Stop when there isn't enough size left in the map for a continuous allocation.
+
+            // If we find an empty entry, store the start index, and check if it has a large enough size.
             if (memoryMap[i] == -1){
-                // Store the physical address in the correct spot, and return the virtual memory address.
-                memoryMap[i] = physicalAddress;
-                return i;
+                index = i;
+
+                // Loop until we hit a non-empty index, we hit the end of the map, or we get to the rght size.
+                for(; i<MEM_MAP_SIZE && i<(index + physicalAddresses.length); i++){
+                    if (memoryMap[i] != -1){
+                        index = -1;
+                        break;
+                    }
+                }
+
+                // If the index is valid, out of the search loop.
+                if (index != -1){
+                    break;
+                }
             }
         }
 
-        return -1;
+        // If we found a valid index, put the physical addresses into the memory map.
+        if (index != -1)
+            for(int i = 0; i<physicalAddresses.length; i++)
+                memoryMap[index + i] = physicalAddresses[i];
+
+        // Return the start index. This will return -1 if a valid entry isn't found.
+        return index;
+    }
+
+    /**
+     * Removes the designated pages from the memory map, and shifts the memory above to fill the gap.
+     * 
+     * @param virtualPagePointer The start of the virtual pages to be cleared.
+     * @param size The amount of pages to be removed.
+     */
+    public void freeMemory(int virtualPagePointer, int size){
+        for(int i = virtualPagePointer; i<(virtualPagePointer + size) && i<MEM_MAP_SIZE; i++){
+            memoryMap[i] = -1;
+        }
     }
 
     /**

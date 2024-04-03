@@ -391,7 +391,7 @@ public class OS {
     /**
      * Allocates memory.
      * 
-     * @param size The amount of memeory to be allocated.
+     * @param size The amount of bytes in memory to be allocated.
      * @return The first pointer in the allocated memory.
      */
     public static int allocateMemory(int size){
@@ -432,7 +432,7 @@ public class OS {
      * Frees the specified page in memory.
      * 
      * @param pointer The start of the addresses in memory to be freed.
-     * @param size The amound of pages to be freed in memory.
+     * @param size The amound of memory in bytes to be freed in memory.
      * 
      * @return True if the freeing was successfull. False otherwize.
      */

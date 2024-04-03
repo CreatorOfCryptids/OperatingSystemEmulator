@@ -454,6 +454,7 @@ public class Kernel implements Runnable{
      * @param deadMemory An array with the memory addresses to be freed.
      */
     public void freeDeadMemory(int[] deadMemory){
+        dbMes("Freeing dead memory.");
         for(int i = 0; i<deadMemory.length; i++){
             if(deadMemory[i] != -1){
                 freeMemMap[deadMemory[i]] = true;

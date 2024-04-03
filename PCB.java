@@ -301,10 +301,13 @@ public class PCB{
      * @param virtualPagePointer The start of the virtual pages to be cleared.
      * @param size The amount of pages to be removed.
      */
-    public void freeMemory(int virtualPagePointer, int size){
-        for(int i = virtualPagePointer; i<(virtualPagePointer + size) && i<MEM_MAP_SIZE; i++){
-            memoryMap[i] = -1;
+    public int[] freeMemory(int virtualPagePointer, int size){
+        int[] freedMemory = new int[size];
+        for(int i = 0; i<size && i<MEM_MAP_SIZE; i++){
+            freedMemory[i] = memoryMap[virtualPagePointer + i];
+            memoryMap[virtualPagePointer + i] = -1;
         }
+        return freedMemory;
     }
 
     /**

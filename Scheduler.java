@@ -125,11 +125,12 @@ public class Scheduler{
 
             // Close the dead process's devices, if it hasn't done so already.
             int[] deviceIDs = currentlyRunning.getDeviceIDs();
-            for(int i = 0; i< deviceIDs.length; i++)
+            for(int i = 0; i< deviceIDs.length; i++){
                 if(deviceIDs[i] != -1){
                     dbMes("Removed device.");
                     kernel.close(deviceIDs[i]);
                 }
+            }
             
             // Free allocated memory.
             int[] usedMemory = currentlyRunning.getMemoryMapping();

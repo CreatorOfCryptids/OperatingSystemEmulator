@@ -468,6 +468,6 @@ public class Kernel implements Runnable{
      * @param message The debug message.
      */
     private void dbMes(String message){
-        //OS.dbMes("|KERNEL: " + message);
+        OS.dbMes("|KERNEL: " + message);
     }
 }

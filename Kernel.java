@@ -4,8 +4,10 @@ public class Kernel implements Runnable{
 
     private Thread thread;
     private Semaphore sem;
+
     private Scheduler scheduler;
     private VFS vfs;
+
     private boolean[] freeMemMap;
 
     /**
@@ -106,6 +108,17 @@ public class Kernel implements Runnable{
                 case WAIT_MESSAGE:
                     dbMes("Get Message.");
                     waitForMessage();
+                    break;
+                
+                // Virtual Memory Management.
+                case ALLOCATE:
+                    dbMes("Allocate Memory.");
+                    allocateMemory(OS.parameters.get(0));
+                    break;
+
+                case FREE:
+                    dbMes("Free memory.");
+                    freeMemory(OS.parameters.get(0), OS.parameters.get(1));
                     break;
                 
                 default:
@@ -290,6 +303,8 @@ public class Kernel implements Runnable{
         }
     }
 
+    // Interprocess Communication Management:
+
     /**
      * Returns the PID of the currentlyRunning process.
      */
@@ -352,6 +367,74 @@ public class Kernel implements Runnable{
             scheduler.addToWaitMes();
         }
             
+    }
+
+    // Virtual Memory Management:
+
+    /**
+     * Adds physical addresses to the currently running process's virtual memory map.
+     * 
+     * @param size The amount of pages the ULP wants.
+     * @return The start of the allocated virtual memory address.
+     */
+    private void allocateMemory(Object size) {
+        // Check inputs.
+        if (size instanceof Integer){
+
+            int[] physicalAddresses = new int[(int)size];
+            int addressCount = 0;
+
+            OS.retval = -1;     // Set the return value to failure, becuase it will only be changed on success.
+
+            // Loop thru the open physcial memory to find open physical addresses.
+            for(int i=0; i<UserLandProcess.PAGE_COUNT; i++){
+
+                // If the current memory is free, add to list.
+                if (freeMemMap[i] = true){
+
+                    physicalAddresses[addressCount++] = i;
+
+                    // If we have enough addresses, have PCB add to virtual memory, and break.
+                    if (addressCount == (int) size){
+                        OS.retval = getCurrentlyRunning().allocateMemory(physicalAddresses);
+                        dbMes("OS: allocated " + addressCount + " pages to virtual memory.");
+
+                        // Set the memory as in use.
+                        for(int j = 0; j<addressCount; j++){
+                            freeMemMap[physicalAddresses[j]] = false;
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+        else{
+            dbMes("Object passed to kernel is not an integer.");
+            OS.retval = -1;
+        }
+    }
+    
+    /**
+     * Frees the designated memory for use by other processes.
+     * 
+     * @param pointer The begginging of the virtal memory to be freed.
+     * @param size THe amount of virtual memory to be freed.
+     * @return True if the memory has been successfully freed. False if otherwize.
+     */
+    private void freeMemory(Object pointer, Object size) {
+        if (pointer instanceof Integer && size instanceof Integer){
+            int[] physicalAddress = getCurrentlyRunning().freeMemory((int) pointer, (int) size);
+            for(int i=0; i<physicalAddress.length; i++){
+                freeMemMap[physicalAddress[i]] = true;
+            }
+
+            OS.retval = ((int) size == physicalAddress.length);
+        }
+        else{
+            dbMes("Object passed to kernel is not an integer.");
+            OS.retval = false;
+        }
     }
 
     // Helper Methods:

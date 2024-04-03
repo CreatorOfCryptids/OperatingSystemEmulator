@@ -339,7 +339,7 @@ public class Scheduler{
         // Get the next process in the queue and set it to currently running.
         currentlyRunning = getRandomQueue().removeFirst();
 
-        // If the process is recived a message, add it to OS.retVal
+        // If the process was waiting for a message, add it to OS.retVal.
         if (currentlyRunning.isWaitingForMessage())
             OS.retval = currentlyRunning.getMessage();
 

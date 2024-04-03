@@ -17,5 +17,9 @@ public class Main {
         // Messages tests:
         OS.createProcess(new Ping());
         OS.createProcess(new Pong());
+
+        // Virtual Memory Tests:
+        OS.createProcess(new MemUser());
+        OS.createProcess(new MoralMemUser());
     }
 }

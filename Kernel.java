@@ -449,6 +449,19 @@ public class Kernel implements Runnable{
     }
     
     /**
+     * A mutator that frees memory used by dead processes.
+     * 
+     * @param deadMemory An array with the memory addresses to be freed.
+     */
+    public void freeDeadMemory(int[] deadMemory){
+        for(int i = 0; i<deadMemory.length; i++){
+            if(deadMemory[i] != -1){
+                freeMemMap[deadMemory[i]] = true;
+            }
+        }
+    }
+
+    /**
      * DEBUGGING HELPER!!!
      * 
      * @param message The debug message.

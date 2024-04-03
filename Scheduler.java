@@ -131,6 +131,10 @@ public class Scheduler{
                     kernel.close(deviceIDs[i]);
                 }
             
+            // Free allocated memory.
+            int[] usedMemory = currentlyRunning.getMemoryMapping();
+            kernel.freeDeadMemory(usedMemory);
+            
             // Remove dead process from HashMap
             processMap.remove(currentlyRunning.getPID());
         }

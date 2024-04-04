@@ -143,6 +143,8 @@ public class Scheduler{
         // Get the next process in the queue and set it to currentlyRunning.
         currentlyRunning = getRandomQueue().removeFirst();
 
+        UserLandProcess.clearTLB();
+
         // If the process was waiting for a message, add it to OS.retVal so it can access the message.
         if (currentlyRunning.isWaitingForMessage())
             OS.retval = currentlyRunning.getMessage();
@@ -339,6 +341,8 @@ public class Scheduler{
 
         // Get the next process in the queue and set it to currently running.
         currentlyRunning = getRandomQueue().removeFirst();
+
+        UserLandProcess.clearTLB();
 
         // If the process was waiting for a message, add it to OS.retVal.
         if (currentlyRunning.isWaitingForMessage())

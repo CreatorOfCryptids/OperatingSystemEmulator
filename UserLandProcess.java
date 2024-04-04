@@ -132,6 +132,16 @@ abstract class UserLandProcess implements Runnable{
     }
 
     /**
+     * Clears the TLB entries
+     */
+    public static void clearTLB(){
+        tlb[0][0] = -1;
+        tlb[0][1] = -1;
+        tlb[1][0] = -1;
+        tlb[1][1] = -1;
+    }
+
+    /**
      * Helper Method: Gets the physical address from the procvided virtual address.
      * 
      * @param address The desired virtal address in memory.

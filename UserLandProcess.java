@@ -5,7 +5,7 @@ abstract class UserLandProcess implements Runnable{
     public static final int PAGE_SIZE = 1024;
     public static final int PAGE_COUNT = 1024;
     public static final int MEM_SIZE = PAGE_COUNT*PAGE_SIZE;   // 1024 Pages with 1024 bytes each.
-    public static int[][] tlb = new int[][]{{-1,-1},{-1,-1}};      // [][0 = Virtual, 1 = Physical]
+    public static int[][] tlb = new int[][]{{-1,-1},{-1,-1}};  // [][0 = Virtual, 1 = Physical]
     
     public static byte[] memory = new byte[MEM_SIZE];    // Virtual memory.
 
@@ -142,6 +142,7 @@ abstract class UserLandProcess implements Runnable{
         int page = address / 1024;
         int offset = address % 1024;
         
+        // Check if TLB has the virtual memory.
         if (tlb[0][0] == page){
             return tlb[0][1] * PAGE_SIZE + offset;
         }
@@ -149,8 +150,10 @@ abstract class UserLandProcess implements Runnable{
             return tlb[1][1] * PAGE_SIZE + offset;
         }
         
+        // If the TLB doesn't have the virual memory map, get the virtual memory from OS.
         OS.getMapping(page);
 
+        // Check for the memory from OS.
         if (tlb[0][0] == page){
             return tlb[0][1] * PAGE_SIZE + offset;
         }

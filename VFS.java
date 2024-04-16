@@ -1,6 +1,6 @@
 public class VFS implements Device{
 
-    public final int CODELEN = 4;   // Length of the device code Strings.
+    public final int CODELEN = 4-1; // Length of the device code Strings. (counting from 0)
     private DeviceMap[] devices;    // A list of the devices currently in use.
     private RandomDevice randDev;   // A reference to the random device object.
     private FakeFileSystem FFSDev;  // A reference to the FakeFileSystem object.
@@ -126,7 +126,7 @@ public class VFS implements Device{
         private int devIndex = 0;   // The index for the file within the device.
 
         DeviceMap(String s){
-            String deviceSpecifyer = s.substring(0, CODELEN);         // Device strings are only 3 char long in my implementation.
+            String deviceSpecifyer = s.substring(0, CODELEN);         // Device strings are only 4 char long in my implementation.
 
             if(deviceSpecifyer.equals("RAND")){
                 dev = randDev;

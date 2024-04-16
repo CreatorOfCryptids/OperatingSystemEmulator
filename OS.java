@@ -9,7 +9,7 @@ public class OS {
     public static Object retval;                // The return value from the Kernel.
 
     public enum CallType{
-        ALLOCATE, CLOSE, CREATE, FREE, SEARCHPID, GETPID, OPEN, READ, SEEK, SEND_MESSAGE, SLEEP, SWITCH, WAIT_MESSAGE, WRITE
+        ALLOCATE, CLOSE, CREATE, FREE, SEARCHPID, GETPID, GET_MAPPING, OPEN, READ, SEEK, SEND_MESSAGE, SLEEP, SWITCH, WAIT_MESSAGE, WRITE
     }
 
     public enum Priority{
@@ -372,20 +372,11 @@ public class OS {
     public static void getMapping(int virtualPageNum){
         dbMes("OS: Get Mapping");
 
-        Random rand = new Random();
-        int tlbIndex = rand.nextInt(2);
+        parameters.clear();
+        parameters.add(virtualPageNum);
+        currentCall = CallType.GET_MAPPING;
 
-        // Make sure the ULP is asking for a valid section of memory.
-        if (virtualPageNum >= 0 && virtualPageNum <UserLandProcess.PAGE_COUNT){
-            UserLandProcess.tlb[tlbIndex][0] = virtualPageNum;
-            UserLandProcess.tlb[tlbIndex][1] = kernel.getCurrentlyRunning().getMemoryMapping(virtualPageNum).get();
-        }
-        // If it's out of bounds, return failure.
-        else{
-            UserLandProcess.tlb[tlbIndex][0] = virtualPageNum;
-            UserLandProcess.tlb[tlbIndex][1] = -1;
-            dbMes("OS: getMapping(): Virtual Page Number " + virtualPageNum + " out of bounds.");
-        }
+        switchToKernel();
     }
 
     /**

@@ -1,4 +1,5 @@
 import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.Semaphore;
 
 public class Kernel implements Runnable{
@@ -118,6 +119,11 @@ public class Kernel implements Runnable{
                     break;
                 
                 // Virtual Memory Management.
+                case GET_MAPPING:
+                    dbMes("Get Mapping.");
+                    getMemoryMapping(OS.parameters.get(0));
+                    break;
+
                 case ALLOCATE:
                     dbMes("Allocate Memory.");
                     allocateMemory(OS.parameters.get(0));
@@ -379,6 +385,36 @@ public class Kernel implements Runnable{
     // Virtual Memory Management:
 
     /**
+     * Adds the specified virtual page into the TLB.
+     * 
+     * @param virtualPageNum The desired virtual page number.
+     */
+    private void getMemoryMapping(Object virtualPageNum){
+        if (virtualPageNum instanceof Integer){
+            Random rand = new Random();
+            int tlbIndex = rand.nextInt(2);
+
+            VirtualToPhysicalMap map = getCurrentlyRunning().getMemoryMapping((int) virtualPageNum);
+
+            // Make sure the ULP is asking for a valid section of memory.
+            if ((int) virtualPageNum >= 0 && (int) virtualPageNum <UserLandProcess.PAGE_COUNT && map.physicalPageNum.isPresent()){
+                UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
+                UserLandProcess.tlb[tlbIndex][1] = map.physicalPageNum.get();
+            }
+            // If it's out of bounds, return failure.
+            else{
+                UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
+                UserLandProcess.tlb[tlbIndex][1] = -1;
+                dbMes("OS: getMapping(): Virtual Page Number " + (int) virtualPageNum + " out of bounds.");
+            }
+        }
+        else{
+            dbMes("Object passed to getMemoryMapping() was not an integer.");
+            OS.retval = -1;
+        }
+    }
+
+    /**
      * Adds physical addresses to the currently running process's virtual memory map.
      * 
      * @param size The amount of pages the ULP wants.
@@ -389,6 +425,9 @@ public class Kernel implements Runnable{
         if (size instanceof Integer){
 
             VirtualToPhysicalMap[] physicalAddresses = new VirtualToPhysicalMap[(int)size];
+            for (int i = 0; i< (int) size; i++)
+                physicalAddresses[i] = new VirtualToPhysicalMap();
+
             int addressCount = 0;
 
             OS.retval = -1;     // Set the return value to failure, becuase it will only be changed on success.
@@ -408,7 +447,7 @@ public class Kernel implements Runnable{
 
                         // Set the memory as in use.
                         for(int j = 0; j<addressCount; j++){
-                            if (physicalAddresses[j].physicalPageNum.isPresent())
+                            //if (physicalAddresses[j].physicalPageNum.isPresent())
                                 freeMemMap[physicalAddresses[j].physicalPageNum.get()] = false;
                         }
 

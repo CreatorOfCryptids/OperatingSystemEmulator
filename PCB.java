@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.Optional;
 
 public class PCB{
     
@@ -250,7 +251,7 @@ public class PCB{
      * @param virtualPageNum The virtual pointer that corresponds to a phycical address in memory.
      * @return The physical address of the virtual pointer, or -1 on failure.
      */
-    public int getMemoryMapping(int virtualPageNum){
+    public Optional<Integer> getMemoryMapping(int virtualPageNum){
         return memoryMap[virtualPageNum].physicalPageNum;
     }
 
@@ -268,12 +269,12 @@ public class PCB{
         for(int i=0; i<MEM_MAP_SIZE - physicalAddresses.length; i++){   // Stop when there isn't enough size left in the map for a continuous allocation.
 
             // If we find an empty entry, store the start index, and check if it has a large enough size.
-            if (memoryMap[i].physicalPageNum == -1){
+            if (memoryMap[i].isFree()){
                 index = i;
 
                 // Loop until we hit a non-empty index, we hit the end of the map, or we get to the rght size.
                 for(; i<MEM_MAP_SIZE && i<(index + physicalAddresses.length); i++){
-                    if (memoryMap[i].physicalPageNum != -1){
+                    if (memoryMap[i].isFree()){
                         index = -1;
                         break;
                     }
@@ -289,7 +290,7 @@ public class PCB{
         // If we found a valid index, put the physical addresses into the memory map.
         if (index != -1)
             for(int i = 0; i<physicalAddresses.length; i++)
-                memoryMap[index + i].physicalPageNum = physicalAddresses[i];
+                memoryMap[index + i].physicalPageNum = Optional.of(physicalAddresses[i]);
 
         // Return the start index. This will return -1 if a valid entry isn't found.
         return index;
@@ -304,8 +305,8 @@ public class PCB{
     public int[] freeMemory(int virtualPagePointer, int size){
         int[] freedMemory = new int[size];
         for(int i = 0; i<size && i<MEM_MAP_SIZE; i++){
-            freedMemory[i] = memoryMap[virtualPagePointer + i].physicalPageNum;
-            memoryMap[virtualPagePointer + i].physicalPageNum = -1;
+            freedMemory[i] = memoryMap[virtualPagePointer + i].physicalPageNum.get();
+            memoryMap[virtualPagePointer + i].physicalPageNum = Optional.empty();
         }
         return freedMemory;
     }

@@ -461,11 +461,9 @@ public class Kernel implements Runnable{
      */
     public void freeDeadMemory(VirtualToPhysicalMap[] deadMemory){
         dbMes("Freeing dead memory.");
-        for(int i = 0; i<deadMemory.length; i++){
-            if(deadMemory[i].physicalPageNum != -1){
-                freeMemMap[deadMemory[i].physicalPageNum] = true;
-            }
-        }
+        for(int i = 0; i<deadMemory.length; i++)
+            if(deadMemory[i].physicalPageNum.isPresent())
+                freeMemMap[deadMemory[i].physicalPageNum.get()] = true;
     }
 
     /**

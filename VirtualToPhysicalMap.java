@@ -1,10 +1,16 @@
+import java.util.Optional;
+
 public class VirtualToPhysicalMap {
     
-    public int physicalPageNum;
-    public int diskPageNum;
+    public Optional<Integer> physicalPageNum;
+    public Optional<Integer> diskPageNum;
 
     public VirtualToPhysicalMap(){
-        physicalPageNum = -1;
-        diskPageNum = -1;
+        physicalPageNum = Optional.empty();
+        diskPageNum = Optional.empty();
+    }
+
+    public boolean isFree(){
+        return (physicalPageNum.isEmpty() && diskPageNum.isEmpty());
     }
 }

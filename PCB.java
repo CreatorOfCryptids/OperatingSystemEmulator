@@ -251,8 +251,8 @@ public class PCB{
      * @param virtualPageNum The virtual pointer that corresponds to a phycical address in memory.
      * @return The physical address of the virtual pointer, or -1 on failure.
      */
-    public Optional<Integer> getMemoryMapping(int virtualPageNum){
-        return memoryMap[virtualPageNum].physicalPageNum;
+    public VirtualToPhysicalMap getMemoryMapping(int virtualPageNum){
+        return memoryMap[virtualPageNum];
     }
 
     /**
@@ -274,7 +274,7 @@ public class PCB{
 
                 // Loop until we hit a non-empty index, we hit the end of the map, or we get to the rght size.
                 for(; i<MEM_MAP_SIZE && i<(index + physicalAddresses.length); i++){
-                    if (memoryMap[i].isFree()){
+                    if (!memoryMap[i].isFree()){
                         index = -1;
                         break;
                     }

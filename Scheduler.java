@@ -133,7 +133,7 @@ public class Scheduler{
             }
             
             // Free allocated memory.
-            int[] usedMemory = currentlyRunning.getMemoryMapping();
+            VirtualToPhysicalMap[] usedMemory = currentlyRunning.getMemoryMapping();
             kernel.freeDeadMemory(usedMemory);
             
             // Remove dead process from HashMap

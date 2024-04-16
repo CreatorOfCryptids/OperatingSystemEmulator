@@ -9,6 +9,8 @@ public class Kernel implements Runnable{
     private VFS vfs;
 
     private boolean[] freeMemMap;
+    private int swapFID;
+    private int pageCount;
 
     /**
      * Constructor.
@@ -22,6 +24,10 @@ public class Kernel implements Runnable{
         freeMemMap = new boolean[UserLandProcess.PAGE_COUNT];
         for(int i = 0; i<UserLandProcess.PAGE_COUNT; i++)
             freeMemMap[i] = true;
+
+        swapFID = vfs.open("FILE swap");
+        pageCount = 0;
+
         
         thread.start();
     }
@@ -453,11 +459,11 @@ public class Kernel implements Runnable{
      * 
      * @param deadMemory An array with the memory addresses to be freed.
      */
-    public void freeDeadMemory(int[] deadMemory){
+    public void freeDeadMemory(VirtualToPhysicalMap[] deadMemory){
         dbMes("Freeing dead memory.");
         for(int i = 0; i<deadMemory.length; i++){
-            if(deadMemory[i] != -1){
-                freeMemMap[deadMemory[i]] = true;
+            if(deadMemory[i].physicalPageNum != -1){
+                freeMemMap[deadMemory[i].physicalPageNum] = true;
             }
         }
     }

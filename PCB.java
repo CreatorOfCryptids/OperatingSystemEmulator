@@ -2,18 +2,18 @@ import java.util.LinkedList;
 
 public class PCB{
     
-    private static int nextPID = 0;         // Stores the number of PCBs.
-    private int pid;                        // This PCB's PID.
-    private static final int MEM_MAP_SIZE = 100;
+    private static int nextPID = 0;             // Stores the number of PCBs.
+    private int pid;                            // This PCB's PID.
+    private static final int MEM_MAP_SIZE = 100;// The size of the memoryMap.
 
-    private UserLandProcess ulp;            // The ULP under this PCB's control
-    private OS.Priority priority;           // The ULP's priority.
-    private int timeouts;                   // The number of times that this ULP has gone to timeout.
+    private UserLandProcess ulp;                // The ULP under this PCB's control
+    private OS.Priority priority;               // The ULP's priority.
+    private int timeouts;                       // The number of times that this ULP has gone to timeout.
 
-    private int[] deviceIDs;                // The index of differnt Devices that this ULP has access to.
-    private int[] memoryMap;                // Stores this processes data. The index is the spot in virual memeory, and the value is the physical address.
+    private int[] deviceIDs;                    // The index of differnt Devices that this ULP has access to.
+    private VirtualToPhysicalMap[] memoryMap;   // Stores this processes data. The index is the spot in virual memeory, and the value is the physical address.
 
-    private LinkedList<Message> messages;   // The queue of messages sent to this process.
+    private LinkedList<Message> messages;       // The queue of messages sent to this process.
     private boolean awaitingMessage;
 
     /**
@@ -34,9 +34,9 @@ public class PCB{
             deviceIDs[i] = -1;
         }
 
-        this.memoryMap = new int[MEM_MAP_SIZE];
+        this.memoryMap = new VirtualToPhysicalMap[MEM_MAP_SIZE];
         for(int i=0; i<MEM_MAP_SIZE; i++){
-            memoryMap[i] = -1;
+            memoryMap[i] = new VirtualToPhysicalMap();
         }
 
         this.messages = new LinkedList<Message>();
@@ -251,7 +251,7 @@ public class PCB{
      * @return The physical address of the virtual pointer, or -1 on failure.
      */
     public int getMemoryMapping(int virtualPageNum){
-        return memoryMap[virtualPageNum];
+        return memoryMap[virtualPageNum].physicalPageNum;
     }
 
     /**
@@ -268,12 +268,12 @@ public class PCB{
         for(int i=0; i<MEM_MAP_SIZE - physicalAddresses.length; i++){   // Stop when there isn't enough size left in the map for a continuous allocation.
 
             // If we find an empty entry, store the start index, and check if it has a large enough size.
-            if (memoryMap[i] == -1){
+            if (memoryMap[i].physicalPageNum == -1){
                 index = i;
 
                 // Loop until we hit a non-empty index, we hit the end of the map, or we get to the rght size.
                 for(; i<MEM_MAP_SIZE && i<(index + physicalAddresses.length); i++){
-                    if (memoryMap[i] != -1){
+                    if (memoryMap[i].physicalPageNum != -1){
                         index = -1;
                         break;
                     }
@@ -289,7 +289,7 @@ public class PCB{
         // If we found a valid index, put the physical addresses into the memory map.
         if (index != -1)
             for(int i = 0; i<physicalAddresses.length; i++)
-                memoryMap[index + i] = physicalAddresses[i];
+                memoryMap[index + i].physicalPageNum = physicalAddresses[i];
 
         // Return the start index. This will return -1 if a valid entry isn't found.
         return index;
@@ -304,8 +304,8 @@ public class PCB{
     public int[] freeMemory(int virtualPagePointer, int size){
         int[] freedMemory = new int[size];
         for(int i = 0; i<size && i<MEM_MAP_SIZE; i++){
-            freedMemory[i] = memoryMap[virtualPagePointer + i];
-            memoryMap[virtualPagePointer + i] = -1;
+            freedMemory[i] = memoryMap[virtualPagePointer + i].physicalPageNum;
+            memoryMap[virtualPagePointer + i].physicalPageNum = -1;
         }
         return freedMemory;
     }
@@ -315,7 +315,7 @@ public class PCB{
      * 
      * @return The memoryMap of this PCB.
      */
-    public int[] getMemoryMapping(){
+    public VirtualToPhysicalMap[] getMemoryMapping(){
         return memoryMap;
     }
 

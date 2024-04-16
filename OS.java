@@ -378,7 +378,7 @@ public class OS {
         // Make sure the ULP is asking for a valid section of memory.
         if (virtualPageNum >= 0 && virtualPageNum <UserLandProcess.PAGE_COUNT){
             UserLandProcess.tlb[tlbIndex][0] = virtualPageNum;
-            UserLandProcess.tlb[tlbIndex][1] = kernel.getCurrentlyRunning().getMemoryMapping(virtualPageNum);
+            UserLandProcess.tlb[tlbIndex][1] = kernel.getCurrentlyRunning().getMemoryMapping(virtualPageNum).get();
         }
         // If it's out of bounds, return failure.
         else{

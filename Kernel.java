@@ -1,3 +1,4 @@
+import java.util.Optional;
 import java.util.concurrent.Semaphore;
 
 public class Kernel implements Runnable{
@@ -8,9 +9,9 @@ public class Kernel implements Runnable{
     private Scheduler scheduler;
     private VFS vfs;
 
-    private boolean[] freeMemMap;
-    private int swapFID;
-    private int pageCount;
+    private boolean[] freeMemMap;   // Stores which physical memory pages are free (true for free, false for in-use)
+    private int swapFID;            // Stores the document used to store overflow memory on disk
+    private int pageCount;          // Stores the current end of the swap file.
 
     /**
      * Constructor.
@@ -387,7 +388,7 @@ public class Kernel implements Runnable{
         // Check inputs.
         if (size instanceof Integer){
 
-            int[] physicalAddresses = new int[(int)size];
+            VirtualToPhysicalMap[] physicalAddresses = new VirtualToPhysicalMap[(int)size];
             int addressCount = 0;
 
             OS.retval = -1;     // Set the return value to failure, becuase it will only be changed on success.
@@ -398,7 +399,7 @@ public class Kernel implements Runnable{
                 // If the current memory is free, add to list.
                 if (freeMemMap[i] = true){
 
-                    physicalAddresses[addressCount++] = i;
+                    physicalAddresses[addressCount++].physicalPageNum = Optional.of(i);
 
                     // If we have enough addresses, have PCB add to virtual memory, and break.
                     if (addressCount == (int) size){
@@ -407,7 +408,8 @@ public class Kernel implements Runnable{
 
                         // Set the memory as in use.
                         for(int j = 0; j<addressCount; j++){
-                            freeMemMap[physicalAddresses[j]] = false;
+                            if (physicalAddresses[j].physicalPageNum.isPresent())
+                                freeMemMap[physicalAddresses[j].physicalPageNum.get()] = false;
                         }
 
                         break;
@@ -430,9 +432,10 @@ public class Kernel implements Runnable{
      */
     private void freeMemory(Object pointer, Object size) {
         if (pointer instanceof Integer && size instanceof Integer){
-            int[] physicalAddress = getCurrentlyRunning().freeMemory((int) pointer, (int) size);
+            VirtualToPhysicalMap[] physicalAddress = getCurrentlyRunning().freeMemory((int) pointer, (int) size);
             for(int i=0; i<physicalAddress.length; i++){
-                freeMemMap[physicalAddress[i]] = true;
+                if (physicalAddress[i].physicalPageNum.isPresent())
+                    freeMemMap[physicalAddress[i].physicalPageNum.get()] = true;
             }
 
             OS.retval = ((int) size == physicalAddress.length);

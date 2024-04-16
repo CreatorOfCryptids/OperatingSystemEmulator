@@ -261,7 +261,7 @@ public class PCB{
      * @param physicalAddress The address for the start of the allocated physical page.
      * @return The virtual memory address, or -1 on failure.
      */
-    public int allocateMemory(int[] physicalAddresses){
+    public int allocateMemory(VirtualToPhysicalMap[] physicalAddresses){
         // Find empty memory with enough space.
         int index = -1;
 
@@ -290,22 +290,22 @@ public class PCB{
         // If we found a valid index, put the physical addresses into the memory map.
         if (index != -1)
             for(int i = 0; i<physicalAddresses.length; i++)
-                memoryMap[index + i].physicalPageNum = Optional.of(physicalAddresses[i]);
+                memoryMap[index + i] = physicalAddresses[i];
 
         // Return the start index. This will return -1 if a valid entry isn't found.
         return index;
     }
 
     /**
-     * Removes the designated pages from the memory map, and shifts the memory above to fill the gap.
+     * Removes the designated pages from the memory map.
      * 
      * @param virtualPagePointer The start of the virtual pages to be cleared.
      * @param size The amount of pages to be removed.
      */
-    public int[] freeMemory(int virtualPagePointer, int size){
-        int[] freedMemory = new int[size];
+    public VirtualToPhysicalMap[] freeMemory(int virtualPagePointer, int size){
+        VirtualToPhysicalMap[] freedMemory = new VirtualToPhysicalMap[size];
         for(int i = 0; i<size && i<MEM_MAP_SIZE; i++){
-            freedMemory[i] = memoryMap[virtualPagePointer + i].physicalPageNum.get();
+            freedMemory[i] = memoryMap[virtualPagePointer + i];
             memoryMap[virtualPagePointer + i].physicalPageNum = Optional.empty();
         }
         return freedMemory;

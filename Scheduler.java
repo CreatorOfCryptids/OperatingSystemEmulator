@@ -61,7 +61,7 @@ public class Scheduler{
             
             currentlyRunning.requestStop();
 
-            dbMes("Sleeping processes: "+sleeping.toString());
+            //dbMes("Sleeping processes: " + sleeping.toString());
 
             // Wake up any sleeping processes that should be awoken.
             while(sleeping.isEmpty() == false && sleeping.getFirst().awaken()){

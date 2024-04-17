@@ -82,12 +82,12 @@ abstract class UserLandProcess implements Runnable{
         try{
             main();
             isDone = true;
-            System.out.println("I died.");
+            System.out.println(this.getClass().getSimpleName() + " died.");
         }
         catch(Exception e){
             System.out.println(e.getLocalizedMessage());
             isDone = true;
-            System.out.println("I failed.");
+            System.out.println(this.getClass().getSimpleName() + " failed.");
         }
 
         // I am doing this because thead.isAlive() didn't give us the right answer and This wouldn't be able to cooperate the right way. 
@@ -114,7 +114,7 @@ abstract class UserLandProcess implements Runnable{
      * @return The memory in said address, or -1 on failure.
      */
     public byte read(int address){
-        dbMes("Read");
+        dbMes("Reading from " + address);
         int mapping = getPhysicalAddress(address);
         if (mapping != -1){
             return memory[mapping];
@@ -130,11 +130,14 @@ abstract class UserLandProcess implements Runnable{
      * @param value The value to be writen.
      */
     public void write(int address, byte value){
-        dbMes("Write");
+        dbMes("Writing " + value + " to address " + address);
 
         int mapping = getPhysicalAddress(address);
         if (mapping != -1){
             memory[mapping] = value;
+        }
+        else{
+            dbMes("Writing failed.");
         }
 
     }
@@ -180,6 +183,7 @@ abstract class UserLandProcess implements Runnable{
         }
         else{
             dbMes("getPhysicalMapping(): Didn't find page address after calling OS.getMapping(" + page + ").");
+            dbMes("TLB: \n" + tlb[0][0] + " " + tlb[0][1] +"\n" + tlb[1][0] + " " + tlb[1][1]);
             return -1;
         }
     }
@@ -190,6 +194,6 @@ abstract class UserLandProcess implements Runnable{
      * @param message The debugging message.
      */
     protected void dbMes(String message){
-        //OS.dbMes("USERLAND_PROCESS (" + this.getClass() + "): " + message);
+        OS.dbMes("USERLAND_PROCESS (" + this.getClass() + "): " + message);
     }
 }

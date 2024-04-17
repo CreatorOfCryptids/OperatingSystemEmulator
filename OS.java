@@ -387,7 +387,7 @@ public class OS {
     public static int allocateMemory(int size){
         dbMes("OS: Allocate Memory");
 
-        if(size % UserLandProcess.PAGE_SIZE !=0){
+        if(size % UserLandProcess.PAGE_SIZE != 0){
             dbMes("OS: Size " + size + " is not a multiple of " + UserLandProcess.PAGE_SIZE + ".");
             return -1;
         }
@@ -497,6 +497,6 @@ public class OS {
      * @param message The message printed to the terminal.
      */
     public static void dbMes(String message){
-        System.out.println("    ||"+message);
+        //System.out.println("    ||"+message);
     }
 }

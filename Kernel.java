@@ -391,22 +391,22 @@ public class Kernel implements Runnable{
      */
     private void getMemoryMapping(Object virtualPageNum){
 
+        Random rand = new Random();
+        int tlbIndex = rand.nextInt(2);
+
         // Make sure the ULP is asking for a valid section of memory.
         if (virtualPageNum instanceof Integer && (int) virtualPageNum >= 0 && (int) virtualPageNum <UserLandProcess.PAGE_COUNT){
             
-            Random rand = new Random();
-            int tlbIndex = rand.nextInt(2);
             VirtualToPhysicalMap map = getCurrentlyRunning().getMemoryMapping((int) virtualPageNum);
 
             if (map != null){
                 
-                // if (map.physicalPageNum.isPresent()){
-                //     dbMes("getMemoryMapping(): Case Physical is present.");
-                //     UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
-                //     UserLandProcess.tlb[tlbIndex][1] = map.physicalPageNum.get();
-                // }
-                // else 
-                if (map.diskPageNum.isPresent()){
+                if (map.physicalPageNum.isPresent()){
+                    dbMes("getMemoryMapping(): CASE: Physical is present.");
+                    UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
+                    UserLandProcess.tlb[tlbIndex][1] = map.physicalPageNum.get();
+                }
+                else{
                     dbMes("getMemoryMapping(): CASE: Disk Is present.");
                     // Find a physical empty physical page
                     int freePage = -1;
@@ -414,6 +414,7 @@ public class Kernel implements Runnable{
                     for(int i=0; i<UserLandProcess.PAGE_COUNT;i++){
                         if (freeMemMap[i] == true){
                             freePage = i;
+                            dbMes("getMemoryMapping(): Found free memory.");
                             break;
                         }
                     }
@@ -463,17 +464,20 @@ public class Kernel implements Runnable{
                     }
                 }
                 // If it's out of bounds, return failure.
-                else{
-                    UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
-                    UserLandProcess.tlb[tlbIndex][1] = -1;
-                    dbMes("getMapping(): Virtual Page Number " + (int) virtualPageNum + " out of bounds.");
-                }
+                // else{
+                    
+                //     dbMes("getMapping(): Virtual Page Number " + (int) virtualPageNum + " out of bounds.");
+                // }
             }
             else{
+                UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
+                    UserLandProcess.tlb[tlbIndex][1] = -1;
                 dbMes("getMapping(): Virtual Page Number " + (int) virtualPageNum + " not allocated.");
             }
         }
         else{
+            UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
+            UserLandProcess.tlb[tlbIndex][1] = -1;
             dbMes("Object passed to getMemoryMapping() was not an integer or out of bounds.");
             OS.retval = -1;
         }
@@ -489,12 +493,12 @@ public class Kernel implements Runnable{
         // Check inputs.
         if (size instanceof Integer){
 
-            VirtualToPhysicalMap[] physicalAddresses = new VirtualToPhysicalMap[(int)size];
+            VirtualToPhysicalMap[] VtPM = new VirtualToPhysicalMap[(int)size];
             for (int i = 0; i< (int) size; i++)
-                physicalAddresses[i] = new VirtualToPhysicalMap();
+                VtPM[i] = new VirtualToPhysicalMap();
 
-            OS.retval = getCurrentlyRunning().allocateMemory(physicalAddresses);
-            
+            OS.retval = getCurrentlyRunning().allocateMemory(VtPM);
+
             // int addressCount = 0;
 
             // OS.retval = -1;     // Set the return value to failure, becuase it will only be changed on success.
@@ -571,7 +575,7 @@ public class Kernel implements Runnable{
     public void freeDeadMemory(VirtualToPhysicalMap[] deadMemory){
         dbMes("Freeing dead memory.");
         for(int i = 0; i<deadMemory.length; i++)
-            if(deadMemory[i].physicalPageNum.isPresent())
+            if(deadMemory[i] != null && deadMemory[i].physicalPageNum.isPresent())
                 freeMemMap[deadMemory[i].physicalPageNum.get()] = true;
     }
 

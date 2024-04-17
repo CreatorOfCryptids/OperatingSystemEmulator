@@ -10,6 +10,11 @@ public class VirtualToPhysicalMap {
         diskPageNum = Optional.empty();
     }
 
+    /**
+     * Determines if either of the entries are not empty
+     * 
+     * @return True if both are empty, false otherwize.
+     */
     public boolean isFree(){
         return (physicalPageNum.isEmpty() && diskPageNum.isEmpty());
     }

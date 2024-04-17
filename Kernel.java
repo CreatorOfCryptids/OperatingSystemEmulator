@@ -407,7 +407,7 @@ public class Kernel implements Runnable{
                     UserLandProcess.tlb[tlbIndex][1] = map.physicalPageNum.get();
                 }
                 else{
-                    dbMes("getMemoryMapping(): CASE: Disk Is present.");
+                    dbMes("getMemoryMapping(): CASE: Physical not present.");
                     // Find a physical empty physical page
                     int freePage = -1;
 
@@ -450,6 +450,9 @@ public class Kernel implements Runnable{
 
                     // Populate data
                     if (map.diskPageNum.isPresent()){
+
+                        dbMes("GetMemory(): CASE: Disk is present.");
+
                         vfs.seek(swapFID, map.diskPageNum.get() * UserLandProcess.PAGE_SIZE);
                         byte[] diskPageData = vfs.read(swapFID, UserLandProcess.PAGE_SIZE);
                         vfs.seek(swapFID, pageCount * UserLandProcess.PAGE_SIZE);
@@ -459,19 +462,20 @@ public class Kernel implements Runnable{
                         }
                     }
                     else{
+
+                        dbMes("GetMemory CASE: Not yet allocated");
+
                         for (int i = 0; i< UserLandProcess.PAGE_SIZE; i++)
                             UserLandProcess.memory[(freePage * UserLandProcess.PAGE_SIZE) + i] = 0;
                     }
+
+                    UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
+                    UserLandProcess.tlb[tlbIndex][1] = map.physicalPageNum.get();
                 }
-                // If it's out of bounds, return failure.
-                // else{
-                    
-                //     dbMes("getMapping(): Virtual Page Number " + (int) virtualPageNum + " out of bounds.");
-                // }
             }
             else{
                 UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
-                    UserLandProcess.tlb[tlbIndex][1] = -1;
+                UserLandProcess.tlb[tlbIndex][1] = -1;
                 dbMes("getMapping(): Virtual Page Number " + (int) virtualPageNum + " not allocated.");
             }
         }

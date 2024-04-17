@@ -1,4 +1,5 @@
 public class MemUser extends UserLandProcess{
+
     public void main(){
         System.out.println("MEM USER: Allocating memory now.");
 
@@ -6,7 +7,7 @@ public class MemUser extends UserLandProcess{
         String test = "Testy McTest Face";
         byte[] testBytes = test.getBytes();
 
-        System.out.println("MEM USER: Wrting \""+test+"\" to mem now. Byte length = " + testBytes.length);
+        System.out.println("MEM USER: Wrting \""+test+"\" to Pointer: " + pointer1 + ". Byte length = " + testBytes.length);
 
         for(int i=0; i<testBytes.length; i++)
             write(pointer1 + i, testBytes[i]);
@@ -25,11 +26,19 @@ public class MemUser extends UserLandProcess{
             System.out.println("Read/Write FAILED!!!");
         }
         
-        System.out.println("Read: \"" + new String(readBytes) + '\"');
+        System.out.println("Read: \"" + new String(readBytes) + "\" (" + testBytes.length + " bytes) from pointer " + pointer1);
+
+        // Testing.
+        for(byte b : readBytes){
+            dbMes("" + b);
+        }
 
         cooperate();
 
         while(true){
+
+            System.out.println("Allocating " + UserLandProcess.PAGE_SIZE + " bytes.");
+
             int pointer2 = OS.allocateMemory(UserLandProcess.PAGE_SIZE);
 
             test = "TEST";

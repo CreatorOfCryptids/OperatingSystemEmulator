@@ -391,18 +391,23 @@ public class Kernel implements Runnable{
      */
     private void getMemoryMapping(Object virtualPageNum){
 
+        // Make sure the ULP is asking for a valid section of memory.
         if (virtualPageNum instanceof Integer && (int) virtualPageNum >= 0 && (int) virtualPageNum <UserLandProcess.PAGE_COUNT){
+            
             Random rand = new Random();
             int tlbIndex = rand.nextInt(2);
-
             VirtualToPhysicalMap map = getCurrentlyRunning().getMemoryMapping((int) virtualPageNum);
-            if (!map.isFree()){
-                // Make sure the ULP is asking for a valid section of memory.
-                if (map.physicalPageNum.isPresent()){
-                    UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
-                    UserLandProcess.tlb[tlbIndex][1] = map.physicalPageNum.get();
-                }
-                else if (map.diskPageNum.isPresent()){
+
+            if (map != null){
+                
+                // if (map.physicalPageNum.isPresent()){
+                //     dbMes("getMemoryMapping(): Case Physical is present.");
+                //     UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
+                //     UserLandProcess.tlb[tlbIndex][1] = map.physicalPageNum.get();
+                // }
+                // else 
+                if (map.diskPageNum.isPresent()){
+                    dbMes("getMemoryMapping(): CASE: Disk Is present.");
                     // Find a physical empty physical page
                     int freePage = -1;
 
@@ -412,13 +417,12 @@ public class Kernel implements Runnable{
                             break;
                         }
                     }
-                    // If found move to there
-                    if (freePage != -1){
-                        //map.diskPageNum = Optional.empty();
-                        map.physicalPageNum = Optional.of(freePage);
-                    }
-                    // If not found, banish a process's data to disk.
-                    else{
+
+                    // If an empty page is not found, banish a process's data to disk.
+                    if (freePage == -1){
+
+                        dbMes("getMemoryMapping(): Time to banish!!!");
+
                         Optional<VirtualToPhysicalMap> banished;
 
                         do{
@@ -432,11 +436,17 @@ public class Kernel implements Runnable{
                             banishedPage[i] = UserLandProcess.memory[freePage + i];
                         }
 
+                        dbMes("GetMemoryMapping() Writing to disk!                                          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");       
+
                         vfs.write(swapFID, banishedPage);
 
                         banished.get().physicalPageNum = Optional.empty();
                         banished.get().diskPageNum = Optional.of(pageCount++);
                     }
+
+                    // Set map's physical page number.
+                    map.physicalPageNum = Optional.of(freePage);
+
                     // Populate data
                     if (map.diskPageNum.isPresent()){
                         vfs.seek(swapFID, map.diskPageNum.get() * UserLandProcess.PAGE_SIZE);
@@ -526,10 +536,10 @@ public class Kernel implements Runnable{
      */
     private void freeMemory(Object pointer, Object size) {
         if (pointer instanceof Integer && size instanceof Integer){
-            VirtualToPhysicalMap[] physicalAddress = getCurrentlyRunning().freeMemory((int) pointer, (int) size);
+            int[] physicalAddress = getCurrentlyRunning().freeMemory((int) pointer, (int) size);
             for(int i=0; i<physicalAddress.length; i++){
-                if (physicalAddress[i].physicalPageNum.isPresent())
-                    freeMemMap[physicalAddress[i].physicalPageNum.get()] = true;
+                if (physicalAddress[i] != -1)
+                    freeMemMap[physicalAddress[i]] = true;
             }
 
             OS.retval = ((int) size == physicalAddress.length);

@@ -36,9 +36,9 @@ public class PCB{
         }
 
         this.memoryMap = new VirtualToPhysicalMap[MEM_MAP_SIZE];
-        for(int i=0; i<MEM_MAP_SIZE; i++){
-            memoryMap[i] = new VirtualToPhysicalMap();
-        }
+        // for(int i=0; i<MEM_MAP_SIZE; i++){
+        //     memoryMap[i] = new VirtualToPhysicalMap();
+        // }
 
         this.messages = new LinkedList<Message>();
         this.awaitingMessage = false;
@@ -269,12 +269,12 @@ public class PCB{
         for(int i=0; i<MEM_MAP_SIZE - physicalAddresses.length; i++){   // Stop when there isn't enough size left in the map for a continuous allocation.
 
             // If we find an empty entry, store the start index, and check if it has a large enough size.
-            if (memoryMap[i].isFree()){
+            if (memoryMap[i] == null){
                 index = i;
 
                 // Loop until we hit a non-empty index, we hit the end of the map, or we get to the rght size.
                 for(; i<MEM_MAP_SIZE && i<(index + physicalAddresses.length); i++){
-                    if (!memoryMap[i].isFree()){
+                    if (memoryMap[i] != null){
                         index = -1;
                         break;
                     }
@@ -302,11 +302,14 @@ public class PCB{
      * @param virtualPagePointer The start of the virtual pages to be cleared.
      * @param size The amount of pages to be removed.
      */
-    public VirtualToPhysicalMap[] freeMemory(int virtualPagePointer, int size){
-        VirtualToPhysicalMap[] freedMemory = new VirtualToPhysicalMap[size];
+    public int[] freeMemory(int virtualPagePointer, int size){
+        int[] freedMemory = new int[size];
         for(int i = 0; i<size && i<MEM_MAP_SIZE; i++){
-            freedMemory[i] = memoryMap[virtualPagePointer + i];
-            memoryMap[virtualPagePointer + i].physicalPageNum = Optional.empty();
+            if (memoryMap[virtualPagePointer + i].physicalPageNum.isPresent())
+                freedMemory[i] = memoryMap[virtualPagePointer + i].physicalPageNum.get();
+            else
+            freedMemory[i] = -1;
+            memoryMap[virtualPagePointer + i] = null;
         }
         return freedMemory;
     }

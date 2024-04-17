@@ -399,15 +399,13 @@ public class Kernel implements Runnable{
             
             VirtualToPhysicalMap map = getCurrentlyRunning().getMemoryMapping((int) virtualPageNum);
 
+            // Check if it's been allocated.
             if (map != null){
                 
-                if (map.physicalPageNum.isPresent()){
-                    dbMes("getMemoryMapping(): CASE: Physical is present.");
-                    UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
-                    UserLandProcess.tlb[tlbIndex][1] = map.physicalPageNum.get();
-                }
-                else{
+                if (map.physicalPageNum.isEmpty()){
+                    
                     dbMes("getMemoryMapping(): CASE: Physical not present.");
+
                     // Find a physical empty physical page
                     int freePage = -1;
 
@@ -469,9 +467,14 @@ public class Kernel implements Runnable{
                             UserLandProcess.memory[(freePage * UserLandProcess.PAGE_SIZE) + i] = 0;
                     }
 
-                    UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
-                    UserLandProcess.tlb[tlbIndex][1] = map.physicalPageNum.get();
+                    
                 }
+                else {
+                    dbMes("getMemoryMapping(): CASE: Physical is present.");
+                }
+                
+                UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
+                UserLandProcess.tlb[tlbIndex][1] = map.physicalPageNum.get();
             }
             else{
                 UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;

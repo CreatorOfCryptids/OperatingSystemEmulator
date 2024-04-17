@@ -280,7 +280,7 @@ public class PCB{
                     }
                 }
 
-                // If the index is valid, out of the search loop.
+                // If the index is valid, exit out of the search loop.
                 if (index != -1){
                     break;
                 }
@@ -288,9 +288,17 @@ public class PCB{
         }
 
         // If we found a valid index, put the physical addresses into the memory map.
-        if (index != -1)
+        if (index != -1){
+
+            dbMes("AllocateMemory(): Valid address found!");
+
             for(int i = 0; i<physicalAddresses.length; i++)
                 memoryMap[index + i] = physicalAddresses[i];
+        }
+        else{
+            dbMes("Invalid address.");
+        }
+            
 
         // Return the start index. This will return -1 if a valid entry isn't found.
         return index;
@@ -362,6 +370,6 @@ public class PCB{
      * @param Message
      */
     private void dbMes(String Message){
-        //OS.dbMes("||PCB (" + ulp.getClass() + "): " + Message);
+        OS.dbMes("||PCB (" + ulp.getClass() + "): " + Message);
     }
 }

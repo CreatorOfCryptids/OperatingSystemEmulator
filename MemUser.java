@@ -2,7 +2,7 @@ public class MemUser extends UserLandProcess{
     public void main(){
         System.out.println("MEM USER: Allocating memory now.");
 
-        int pointer1 = OS.allocateMemory(2048);
+        int pointer1 = OS.allocateMemory(UserLandProcess.PAGE_SIZE*2);
         String test = "Testy McTest Face";
         byte[] testBytes = test.getBytes();
 
@@ -30,7 +30,7 @@ public class MemUser extends UserLandProcess{
         cooperate();
 
         while(true){
-            int pointer2 = OS.allocateMemory(1024);
+            int pointer2 = OS.allocateMemory(UserLandProcess.PAGE_SIZE);
 
             test = "TEST";
             testBytes = test.getBytes();
@@ -41,6 +41,8 @@ public class MemUser extends UserLandProcess{
             System.out.println("MEM USER: Wrting \""+test+"\" to mem now. Byte length = " + testBytes.length);
 
             cooperate();
+
+            OS.sleep(100);
 
             readBytes = new byte[testBytes.length];
 

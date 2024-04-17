@@ -1,6 +1,6 @@
 public class VFS implements Device{
 
-    public final int CODELEN = 4-1; // Length of the device code Strings. (counting from 0)
+    public final int CODELEN = 4;   // Length of the device code Strings.
     private DeviceMap[] devices;    // A list of the devices currently in use.
     private RandomDevice randDev;   // A reference to the random device object.
     private FakeFileSystem FFSDev;  // A reference to the FakeFileSystem object.

@@ -21,5 +21,6 @@ public class Main {
         // Virtual Memory Tests:
         OS.createProcess(new MemUser());
         OS.createProcess(new MoralMemUser());
+        OS.createProcess(new PigMother());
     }
 }

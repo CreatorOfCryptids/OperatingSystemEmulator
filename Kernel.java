@@ -493,33 +493,35 @@ public class Kernel implements Runnable{
             for (int i = 0; i< (int) size; i++)
                 physicalAddresses[i] = new VirtualToPhysicalMap();
 
-            int addressCount = 0;
+            OS.retval = getCurrentlyRunning().allocateMemory(physicalAddresses);
+            
+            // int addressCount = 0;
 
-            OS.retval = -1;     // Set the return value to failure, becuase it will only be changed on success.
+            // OS.retval = -1;     // Set the return value to failure, becuase it will only be changed on success.
 
-            // Loop thru the open physcial memory to find open physical addresses.
-            for(int i=0; i<UserLandProcess.PAGE_COUNT; i++){
+            // // Loop thru the open physcial memory to find open physical addresses.
+            // for(int i=0; i<UserLandProcess.PAGE_COUNT; i++){
 
-                // If the current memory is free, add to list.
-                if (freeMemMap[i] = true){
+            //     // If the current memory is free, add to list.
+            //     if (freeMemMap[i] = true){
 
-                    physicalAddresses[addressCount++].physicalPageNum = Optional.of(i);
+            //         physicalAddresses[addressCount++].physicalPageNum = Optional.of(i);
 
-                    // If we have enough addresses, have PCB add to virtual memory, and break.
-                    if (addressCount == (int) size){
-                        OS.retval = getCurrentlyRunning().allocateMemory(physicalAddresses);
-                        dbMes("OS: allocated " + addressCount + " pages to virtual memory.");
+            //         // If we have enough addresses, have PCB add to virtual memory, and break.
+            //         if (addressCount == (int) size){
+            //             OS.retval = getCurrentlyRunning().allocateMemory(physicalAddresses);
+            //             dbMes("OS: allocated " + addressCount + " pages to virtual memory.");
 
-                        // Set the memory as in use.
-                        for(int j = 0; j<addressCount; j++){
-                            //if (physicalAddresses[j].physicalPageNum.isPresent())
-                                freeMemMap[physicalAddresses[j].physicalPageNum.get()] = false;
-                        }
+            //             // Set the memory as in use.
+            //             for(int j = 0; j<addressCount; j++){
+            //                 //if (physicalAddresses[j].physicalPageNum.isPresent())
+            //                     freeMemMap[physicalAddresses[j].physicalPageNum.get()] = false;
+            //             }
 
-                        break;
-                    }
-                }
-            }
+            //             break;
+            //         }
+            //     }
+            // }
         }
         else{
             dbMes("Object passed to kernel is not an integer.");

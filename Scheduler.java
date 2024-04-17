@@ -5,6 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Semaphore;
 import java.time.Clock;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class Scheduler{
@@ -200,6 +201,16 @@ public class Scheduler{
      */
     public PCB getCurrentlyRunning(){
         return currentlyRunning;
+    }
+
+    /**
+     * Retrieves a random PCB from the currently running processes.
+     * 
+     * @return A random PCB.
+     */
+    public PCB getRandomProcess(){
+        Collection<PCB> processes = processMap.values();
+        return (PCB) processes.toArray()[rand.nextInt(processes.size())];
     }
 
     /**

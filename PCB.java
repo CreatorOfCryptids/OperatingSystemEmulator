@@ -320,6 +320,19 @@ public class PCB{
         return memoryMap;
     }
 
+    /**
+     * Returns the first physical page in use by this PCB.
+     * 
+     * @return An Optional containing a VirtualToPhysicalMap with a physical address.
+     */
+    public Optional<VirtualToPhysicalMap> getPhysicalPage(){
+        for(int i = 0; i<MEM_MAP_SIZE; i++)
+            if (memoryMap[i].physicalPageNum.isPresent())
+                return Optional.of(memoryMap[i]);
+        
+        return Optional.empty();
+    }
+
     // Debugging helper methods:
 
     /**

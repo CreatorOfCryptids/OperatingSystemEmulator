@@ -12,7 +12,7 @@ public class Kernel implements Runnable{
 
     private boolean[] freeMemMap;   // Stores which physical memory pages are free (true for free, false for in-use)
     private int swapFID;            // Stores the document used to store overflow memory on disk
-    private int pageCount;          // Stores the current end of the swap file.
+    private int pageCount;          // Stores the amount pages writen to memory.
 
     /**
      * Constructor.
@@ -390,26 +390,81 @@ public class Kernel implements Runnable{
      * @param virtualPageNum The desired virtual page number.
      */
     private void getMemoryMapping(Object virtualPageNum){
-        if (virtualPageNum instanceof Integer){
+
+        if (virtualPageNum instanceof Integer && (int) virtualPageNum >= 0 && (int) virtualPageNum <UserLandProcess.PAGE_COUNT){
             Random rand = new Random();
             int tlbIndex = rand.nextInt(2);
 
             VirtualToPhysicalMap map = getCurrentlyRunning().getMemoryMapping((int) virtualPageNum);
+            if (!map.isFree()){
+                // Make sure the ULP is asking for a valid section of memory.
+                if (map.physicalPageNum.isPresent()){
+                    UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
+                    UserLandProcess.tlb[tlbIndex][1] = map.physicalPageNum.get();
+                }
+                else if (map.diskPageNum.isPresent()){
+                    // Find a physical empty physical page
+                    int freePage = -1;
 
-            // Make sure the ULP is asking for a valid section of memory.
-            if ((int) virtualPageNum >= 0 && (int) virtualPageNum <UserLandProcess.PAGE_COUNT && map.physicalPageNum.isPresent()){
-                UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
-                UserLandProcess.tlb[tlbIndex][1] = map.physicalPageNum.get();
+                    for(int i=0; i<UserLandProcess.PAGE_COUNT;i++){
+                        if (freeMemMap[i] == true){
+                            freePage = i;
+                            break;
+                        }
+                    }
+                    // If found move to there
+                    if (freePage != -1){
+                        //map.diskPageNum = Optional.empty();
+                        map.physicalPageNum = Optional.of(freePage);
+                    }
+                    // If not found, banish a process's data to disk.
+                    else{
+                        Optional<VirtualToPhysicalMap> banished;
+
+                        do{
+                            banished = scheduler.getRandomProcess().getPhysicalPage();
+                        } while (banished.isPresent() && banished.get().physicalPageNum.isEmpty());
+
+                        freePage = banished.get().physicalPageNum.get();
+                        byte[] banishedPage = new byte[UserLandProcess.PAGE_SIZE];
+
+                        for(int i = 0; i<UserLandProcess.PAGE_SIZE; i++){
+                            banishedPage[i] = UserLandProcess.memory[freePage + i];
+                        }
+
+                        vfs.write(swapFID, banishedPage);
+
+                        banished.get().physicalPageNum = Optional.empty();
+                        banished.get().diskPageNum = Optional.of(pageCount++);
+                    }
+                    // Populate data
+                    if (map.diskPageNum.isPresent()){
+                        vfs.seek(swapFID, map.diskPageNum.get() * UserLandProcess.PAGE_SIZE);
+                        byte[] diskPageData = vfs.read(swapFID, UserLandProcess.PAGE_SIZE);
+                        vfs.seek(swapFID, pageCount * UserLandProcess.PAGE_SIZE);
+
+                        for(int i=0; i<UserLandProcess.PAGE_SIZE; i++){
+                            UserLandProcess.memory[i + (map.diskPageNum.get() * UserLandProcess.PAGE_SIZE)] = diskPageData[i];
+                        }
+                    }
+                    else{
+                        for (int i = 0; i< UserLandProcess.PAGE_SIZE; i++)
+                            UserLandProcess.memory[(freePage * UserLandProcess.PAGE_SIZE) + i] = 0;
+                    }
+                }
+                // If it's out of bounds, return failure.
+                else{
+                    UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
+                    UserLandProcess.tlb[tlbIndex][1] = -1;
+                    dbMes("getMapping(): Virtual Page Number " + (int) virtualPageNum + " out of bounds.");
+                }
             }
-            // If it's out of bounds, return failure.
             else{
-                UserLandProcess.tlb[tlbIndex][0] = (int) virtualPageNum;
-                UserLandProcess.tlb[tlbIndex][1] = -1;
-                dbMes("OS: getMapping(): Virtual Page Number " + (int) virtualPageNum + " out of bounds.");
+                dbMes("getMapping(): Virtual Page Number " + (int) virtualPageNum + " not allocated.");
             }
         }
         else{
-            dbMes("Object passed to getMemoryMapping() was not an integer.");
+            dbMes("Object passed to getMemoryMapping() was not an integer or out of bounds.");
             OS.retval = -1;
         }
     }

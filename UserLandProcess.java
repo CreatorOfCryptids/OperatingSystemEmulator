@@ -79,11 +79,19 @@ abstract class UserLandProcess implements Runnable{
     public void run(){
         dbMes("Run");
         sem.acquireUninterruptibly();
-        main();
+        try{
+            main();
+            isDone = true;
+            System.out.println("I died.");
+        }
+        catch(Exception e){
+            System.out.println(e.getLocalizedMessage());
+            isDone = true;
+            System.out.println("I failed.");
+        }
 
         // I am doing this because thead.isAlive() didn't give us the right answer and This wouldn't be able to cooperate the right way. 
-        isDone = true;
-        System.out.println("I died.");
+        
         OS.switchProcess();
     }
 
@@ -182,6 +190,6 @@ abstract class UserLandProcess implements Runnable{
      * @param message The debugging message.
      */
     protected void dbMes(String message){
-        OS.dbMes("USERLAND_PROCESS (" + this.getClass() + "): " + message);
+        //OS.dbMes("USERLAND_PROCESS (" + this.getClass() + "): " + message);
     }
 }

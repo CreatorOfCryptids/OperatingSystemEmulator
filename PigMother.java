@@ -2,7 +2,7 @@ public class PigMother extends UserLandProcess{
     
     public void main(){
 
-        for(int i = 0; i<20; i++){
+        for(int i = 0; i<11; i++){
             OS.createProcess(new Piggy(i), OS.Priority.BACKGROUND);
             cooperate();
         }

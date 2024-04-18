@@ -12,17 +12,21 @@ public class Piggy extends UserLandProcess{
         System.out.println("Allocating memory now Oink!!!");
 
         int pointer = OS.allocateMemory(99 * UserLandProcess.PAGE_SIZE);
-        byte[] oink = "OINK!!!".getBytes();
+        byte[] oink = ("OINK!!! " + number).getBytes();
         cooperate();
-        
 
+        for(int j=0; j<PCB.MEM_MAP_SIZE-1; j++){
+            for(int i=0; i<oink.length;i++){
+                write(pointer+i+(j*UserLandProcess.PAGE_SIZE), oink[i % oink.length]);
+            }
+        }
+        
         while(true){
             cooperate();
             
-            for(int i=0; i<oink.length;i++){
-                write(pointer+i+(0*UserLandProcess.PAGE_SIZE), oink[i % oink.length]);
-                cooperate();
-            }
+            // for(int i=0; i<oink.length;i++){
+            //     write(pointer+i+(0*UserLandProcess.PAGE_SIZE), oink[i % oink.length]);
+            // }
             
             System.out.println("Oink!!! " + number + " pointer = " + pointer);
             

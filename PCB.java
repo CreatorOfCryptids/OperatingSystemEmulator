@@ -12,7 +12,7 @@ public class PCB{
     private int timeouts;                       // The number of times that this ULP has gone to timeout.
 
     private int[] deviceIDs;                    // The index of differnt Devices that this ULP has access to.
-    private VirtualToPhysicalMap[] memoryMap;   // Stores this processes data. The index is the spot in virual memeory, and the value is the physical address.
+    private VirtualToPhysicalMap[] memoryMap;   // Stores this processes data. The index is the spot in virual memeory, and the value is the physical/disk address.
 
     private LinkedList<Message> messages;       // The queue of messages sent to this process.
     private boolean awaitingMessage;

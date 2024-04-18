@@ -413,6 +413,7 @@ public class Kernel implements Runnable{
                 // If no free pages, banish someone to disk.
                 if (foundPage == -1){
 
+                    // Added to make sure this path was taken.
                     System.out.println("Writing to disk.                                                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
                     Optional<VirtualToPhysicalMap> banished;

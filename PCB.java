@@ -5,7 +5,7 @@ public class PCB{
     
     private static int nextPID = 0;             // Stores the number of PCBs.
     private int pid;                            // This PCB's PID.
-    private static final int MEM_MAP_SIZE = 100;// The size of the memoryMap.
+    public static final int MEM_MAP_SIZE = 100;// The size of the memoryMap.
 
     private UserLandProcess ulp;                // The ULP under this PCB's control
     private OS.Priority priority;               // The ULP's priority.
@@ -338,7 +338,7 @@ public class PCB{
      */
     public Optional<VirtualToPhysicalMap> getPhysicalPage(){
         for(int i = 0; i<MEM_MAP_SIZE; i++)
-            if (memoryMap[i].physicalPageNum.isPresent())
+            if (memoryMap[i] != null && memoryMap[i].physicalPageNum.isPresent())
                 return Optional.of(memoryMap[i]);
         
         return Optional.empty();

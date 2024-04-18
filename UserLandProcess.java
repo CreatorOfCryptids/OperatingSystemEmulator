@@ -130,10 +130,11 @@ abstract class UserLandProcess implements Runnable{
      * @param value The value to be writen.
      */
     public void write(int address, byte value){
-        dbMes("Writing " + value + " to address " + address);
+        
 
         int mapping = getPhysicalAddress(address);
         if (mapping != -1){
+            dbMes("Writing " + value + " to mapping " + mapping);
             memory[mapping] = value;
         }
         else{

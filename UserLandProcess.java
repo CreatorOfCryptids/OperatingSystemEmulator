@@ -85,6 +85,7 @@ abstract class UserLandProcess implements Runnable{
             System.out.println(this.getClass().getSimpleName() + " died.");
         }
         catch(Exception e){
+            // Catch exceptions so that they don't effect other processes.
             System.out.println(e.getLocalizedMessage());
             isDone = true;
             System.out.println(this.getClass().getSimpleName() + " failed.");
@@ -131,8 +132,8 @@ abstract class UserLandProcess implements Runnable{
      */
     public void write(int address, byte value){
         
-
         int mapping = getPhysicalAddress(address);
+
         if (mapping != -1){
             dbMes("Writing " + value + " to mapping " + mapping);
             memory[mapping] = value;

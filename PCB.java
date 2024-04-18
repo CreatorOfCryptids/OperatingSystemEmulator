@@ -246,10 +246,10 @@ public class PCB{
     // Memory Management:
 
     /**
-     * Returns the physical address of the provided virtualPageNumber.
+     * Returns the VirtualToPhysicalMaps of the provided virtualPageNumber.
      * 
      * @param virtualPageNum The virtual pointer that corresponds to a phycical address in memory.
-     * @return The physical address of the virtual pointer, or -1 on failure.
+     * @return The VirtualToPhysicalAddress address of the virtual pointer. COULD RETURN NULL
      */
     public VirtualToPhysicalMap getMemoryMapping(int virtualPageNum){
         return memoryMap[virtualPageNum];

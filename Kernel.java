@@ -414,7 +414,7 @@ public class Kernel implements Runnable{
                 if (foundPage == -1){
 
                     // Added to make sure this path was taken.
-                    System.out.println("Writing to disk.                                                    !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    dbMes("Writing to disk.");
 
                     Optional<VirtualToPhysicalMap> banished;
 

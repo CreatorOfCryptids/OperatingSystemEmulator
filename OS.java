@@ -43,7 +43,7 @@ public class OS {
      * @param up The process to be added.
      * @return The PID of the new process.
      */
-    public static int createProcess(UserLandProcess up) {
+    public static Optional<Integer> createProcess(UserLandProcess up) {
 
         dbMes("OS: Creating new Process: " + up.getClass());
 
@@ -60,7 +60,7 @@ public class OS {
 
         while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
             try{
-                return (int) retval;
+                return (Optional<Integer>) retval;
             } catch (Exception e){
                 try{
                     Thread.sleep(5);
@@ -76,7 +76,7 @@ public class OS {
      * @param priority The priority of the new process.
      * @return The PID of the new Process.
      */
-    public static int createProcess(UserLandProcess up, Priority priority){
+    public static Optional<Integer> createProcess(UserLandProcess up, Priority priority){
 
         dbMes("OS: Creating new Process: " + up.getClass() + " Priority: " + priority.toString());
 
@@ -90,7 +90,7 @@ public class OS {
 
         while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
             try{
-                return (int) retval;
+                return (Optional<Integer>) retval;
             } catch (Exception e){
                 try{
                     Thread.sleep(5);
@@ -194,9 +194,8 @@ public class OS {
      * 
      * @param FID The File ID of the device to be seeked.
      * @param size The distance to be seeked
-     * @return The distance that was seeked. 
      */
-    public static Optional<Integer> seek(int FID, int size){
+    public static void seek(int FID, int size){
         OS.dbMes("OS: Seeking FID: " + FID + " Size: " + size);
 
         parameters.clear();
@@ -206,16 +205,6 @@ public class OS {
         currentCall = CallType.SEEK;
 
         switchToKernel();
-
-        while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
-            try{
-                return (Optional<Integer>) retval;
-            } catch (Exception e){
-                try{
-                    Thread.sleep(5);
-                } catch(Exception ex){}
-            }
-        }
     }
 
     /**
@@ -268,7 +257,7 @@ public class OS {
      * 
      * @return The PID of the process.
      */
-    public static int getPID(){
+    public static Optional<Integer> getPID(){
         OS.dbMes("OS: Get PID");
 
         parameters.clear();
@@ -279,7 +268,7 @@ public class OS {
 
         while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
             try{
-                return (int) retval;
+                return (Optional<Integer>) retval;
             } catch (Exception e){
                 try{
                     Thread.sleep(5);
@@ -385,12 +374,12 @@ public class OS {
      * @param size The amount of bytes in memory to be allocated.
      * @return The first pointer in the allocated memory.
      */
-    public static int allocateMemory(int size){
+    public static Optional<Integer> allocateMemory(int size){
         dbMes("OS: Allocate Memory");
 
         if(size % UserLandProcess.PAGE_SIZE != 0){
             dbMes("OS: Size " + size + " is not a multiple of " + UserLandProcess.PAGE_SIZE + ".");
-            return -1;
+            return Optional.empty();
         }
 
         // Change to number of pages added because we don't support removing anything smaller anyway.
@@ -407,7 +396,7 @@ public class OS {
         while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
             try{
                 if(retval != null)
-                    return (int) retval;
+                    return (Optional<Integer>) retval;
             } catch (Exception e){
                 try{
                     Thread.sleep(5);

@@ -6,13 +6,13 @@ public class MultiFIle extends UserLandProcess{
             System.out.println("Opening devices.");
 
             // Open file
-            int ffsFID = OS.open("FILE test.txt");
+            int ffsFID = OS.open("FILE test.txt").get();
             if(ffsFID == -1){
                 dbMes("ERROR: Issue opening test.txt");
             }
 
             // Open rand
-            int randFID = OS.open("RAND");
+            int randFID = OS.open("RAND").get();
             if(randFID == -1){
                 dbMes("ERROR: Issue opening test.txt");
             }
@@ -21,12 +21,12 @@ public class MultiFIle extends UserLandProcess{
 
             // Read from rand
             System.out.println("Reading from Rand");
-            byte[] data = OS.read(randFID, 4);
+            byte[] data = OS.read(randFID, 4).get();
             System.out.println("Read "+ new String(data) +" from Rand");
             
             // Write to file
             System.out.println("Writing to test.txt");
-            if(OS.write(ffsFID, data) == -1)
+            if(OS.write(ffsFID, data).isEmpty())
                 dbMes("ERROR: Issue writing to test.txt");
 
             cooperate();

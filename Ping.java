@@ -6,7 +6,7 @@ public class Ping extends UserLandProcess{
 
         System.out.println("PING: I am PING and my PID is " + pingPID);
 
-        int pongPID = OS.searchPID("Pong");
+        int pongPID = OS.searchPID("Pong").get();
 
         System.out.println("PING: Pong's PID is: " + pongPID);
 

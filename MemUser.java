@@ -3,7 +3,7 @@ public class MemUser extends UserLandProcess{
     public void main(){
         System.out.println("MEM USER: Allocating memory now.");
 
-        int pointer1 = OS.allocateMemory(UserLandProcess.PAGE_SIZE*2);
+        int pointer1 = OS.allocateMemory(UserLandProcess.PAGE_SIZE*2).get();
         String test = "Testy McTest Face";
         byte[] testBytes = test.getBytes();
 
@@ -39,7 +39,7 @@ public class MemUser extends UserLandProcess{
 
             System.out.println("Allocating " + UserLandProcess.PAGE_SIZE + " bytes.");
 
-            int pointer2 = OS.allocateMemory(UserLandProcess.PAGE_SIZE);
+            int pointer2 = OS.allocateMemory(UserLandProcess.PAGE_SIZE).get();
 
             test = "TEST";
             testBytes = test.getBytes();

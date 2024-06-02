@@ -257,7 +257,7 @@ public class OS {
      * 
      * @return The PID of the process.
      */
-    public static Optional<Integer> getPID(){
+    public static int getPID(){
         OS.dbMes("OS: Get PID");
 
         parameters.clear();
@@ -268,7 +268,7 @@ public class OS {
 
         while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
             try{
-                return (Optional<Integer>) retval;
+                return (int) retval;
             } catch (Exception e){
                 try{
                     Thread.sleep(5);

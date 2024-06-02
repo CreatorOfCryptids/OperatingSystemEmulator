@@ -11,7 +11,7 @@ public class Piggy extends UserLandProcess{
 
         System.out.println("Allocating memory now Oink!!!");
 
-        int pointer = OS.allocateMemory(99 * UserLandProcess.PAGE_SIZE);
+        int pointer = OS.allocateMemory(99 * UserLandProcess.PAGE_SIZE).get();
         byte[] oink = ("OINK!!! " + number).getBytes();
         cooperate();
 

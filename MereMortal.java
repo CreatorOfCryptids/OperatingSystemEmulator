@@ -4,7 +4,7 @@ public class MereMortal extends UserLandProcess{
 
         System.out.println("Starting MereMortal.");
 
-        int fid = OS.open("RAND 69");
+        int fid = OS.open("RAND 69").get();
         if(fid == -1){
             dbMes("ERROR: Issue opening test.txt");
         }
@@ -15,7 +15,7 @@ public class MereMortal extends UserLandProcess{
 
             cooperate();
 
-            System.out.printf("I AM MORTAL, I WILL DIE ONE DAY. FID = %d, Rand = %d\n", fid, OS.read(fid, 1)[0]);
+            System.out.printf("I AM MORTAL, I WILL DIE ONE DAY. FID = %d, Rand = %d\n", fid, OS.read(fid, 1).get()[0]);
 
             OS.sleep(200);
         }

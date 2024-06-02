@@ -6,7 +6,7 @@ public class Reader extends UserLandProcess{
             
             // Open file
             System.out.println("READER: open file");
-            int ffsFID = OS.open("FILE test.txt");
+            int ffsFID = OS.open("FILE test.txt").get();
             if(ffsFID == -1){
                 dbMes("ERROR: Issue opening test.txt");
             }
@@ -18,7 +18,7 @@ public class Reader extends UserLandProcess{
 
             // Read file.
             System.out.println("Reader: Reading");
-            String output = new String(OS.read(ffsFID, 4));
+            String output = new String(OS.read(ffsFID, 4).get());
             System.out.println("READER: From file: " + output);
 
             cooperate();

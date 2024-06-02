@@ -1,7 +1,7 @@
 public class Pong extends UserLandProcess{
 
     public void main() {
-        int pingPID = OS.searchPID("Ping");
+        int pingPID = OS.searchPID("Ping").get();
         int pongPID = OS.getPID();
 
         System.out.println("PONG: My name is PONG and my pid is: " + pongPID);

@@ -3,7 +3,7 @@ public class MoralMemUser extends UserLandProcess{
 
         System.out.println("Allocating memory");
 
-        int pointer = OS.allocateMemory(3072);
+        int pointer = OS.allocateMemory(3072).get();
 
         System.out.println("Memory allocated at " + pointer);
 

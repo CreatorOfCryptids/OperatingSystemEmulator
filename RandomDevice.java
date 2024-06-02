@@ -1,3 +1,4 @@
+import java.util.Optional;
 import java.util.Random;
 
 public class RandomDevice implements Device{
@@ -14,7 +15,7 @@ public class RandomDevice implements Device{
      * @param s The seed for the random device.
      * @return The FID of the random device.
      */
-    public int open(String s) {
+    public Optional<Integer> open(String s) {
 
         int fid = -1;
 
@@ -31,7 +32,7 @@ public class RandomDevice implements Device{
         if(fid == -1){
             // If an open space wasn't found return error.
             dbMes("ERROR: No available entries.");
-            return -1;
+            return Optional.empty();
         }
         else if(s != null && s.equals("") == false){
             // If they gave us a seed, use that to seed the rand.
@@ -43,7 +44,7 @@ public class RandomDevice implements Device{
         }
         
         dbMes("FID: " + fid);
-        return fid;
+        return Optional.of(fid);
     }
 
     /**
@@ -62,13 +63,13 @@ public class RandomDevice implements Device{
      * @param id The FID of the random device.
      * @param size The amount of bytes to be read from the device.
      */
-    public byte[] read(int id, int size) {
+    public Optional<byte[]> read(int id, int size) {
         dbMes("Read().");
         byte[] retval = new byte[size];
 
         rands[id].nextBytes(retval);
 
-        return retval;
+        return Optional.of(retval);
     }
 
     /**
@@ -90,9 +91,9 @@ public class RandomDevice implements Device{
      * @param data The data that would be writen to the device if it could be writen.
      * @return 0. You can't write to this thing, dumbass.
      */
-    public int write(int id, byte[] data) {
+    public Optional<Integer> write(int id, byte[] data) {
         dbMes("Write()???");
-        return 0;
+        return Optional.of(0);
     }
 
     /**

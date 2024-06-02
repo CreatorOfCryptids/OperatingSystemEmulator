@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class OS {
     
@@ -137,7 +138,7 @@ public class OS {
      * @param device
      * @return The FID of the opened device, or -1 if it fails.
      */
-    public static int open(String device){
+    public static Optional<Integer> open(String device){
 
         OS.dbMes("OS: Opening " + device);
 
@@ -150,7 +151,7 @@ public class OS {
 
         while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
             try{
-                return (int) retval;
+                return (Optional<Integer>) retval;
             } catch (Exception e){
                 try{
                     Thread.sleep(5);
@@ -166,7 +167,7 @@ public class OS {
      * @param size The amount of data in bytes to be read.
      * @return
      */
-    public static byte[] read(int FID, int size){
+    public static Optional<byte[]> read(int FID, int size){
         OS.dbMes("OS: Reading " + FID + " Size: " + size);
 
         parameters.clear();
@@ -179,7 +180,7 @@ public class OS {
 
         while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
             try{
-                return (byte[]) retval;
+                return (Optional<byte[]>) retval;
             } catch (Exception e){
                 try{
                     Thread.sleep(5);
@@ -195,7 +196,7 @@ public class OS {
      * @param size The distance to be seeked
      * @return The distance that was seeked. 
      */
-    public static int seek(int FID, int size){
+    public static Optional<Integer> seek(int FID, int size){
         OS.dbMes("OS: Seeking FID: " + FID + " Size: " + size);
 
         parameters.clear();
@@ -208,7 +209,7 @@ public class OS {
 
         while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
             try{
-                return (int) retval;
+                return (Optional<Integer>) retval;
             } catch (Exception e){
                 try{
                     Thread.sleep(5);
@@ -224,7 +225,7 @@ public class OS {
      * @param data The data passed to the device.
      * @return The amount of data written to the device.
      */
-    public static int write(int FID, byte[] data){
+    public static Optional<Integer> write(int FID, byte[] data){
         OS.dbMes("OS: Writing to " + FID + " Data: " + data);
 
         parameters.clear();
@@ -237,7 +238,7 @@ public class OS {
 
         while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
             try{
-                return (int) retval;
+                return (Optional<Integer>) retval;
             } catch (Exception e){
                 try{
                     Thread.sleep(5);
@@ -294,7 +295,7 @@ public class OS {
      * @param name The name of the desired process.
      * @return The PID of the named process, or -1 on failure.
      */
-    public static int searchPID(String name){
+    public static Optional<Integer> searchPID(String name){
         OS.dbMes("OS: Get PID of \"" + name + "\"");
 
         parameters.clear();
@@ -306,7 +307,7 @@ public class OS {
 
         while(true){    // The processes are async, so this will sometimes run before Kernel can update it.
             try{
-                return (int) retval;
+                return (Optional<Integer>) retval;
             } catch (Exception e){
                 try{
                     Thread.sleep(5);

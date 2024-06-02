@@ -145,7 +145,7 @@ public class VFS implements Device{
 
             if (dev != null){
                 
-                Optional<Integer> index = dev.open(deviceSpecifyer);
+                Optional<Integer> index = dev.open(s.substring(CODELEN));
 
                 if (index.isPresent()){
                     devIndex = index.get();

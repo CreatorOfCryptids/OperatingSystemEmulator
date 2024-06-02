@@ -1,3 +1,5 @@
+import java.util.Optional;
+
 public class VFS implements Device{
 
     public final int CODELEN = 4;   // Length of the device code Strings.
@@ -16,7 +18,7 @@ public class VFS implements Device{
      * 
      * @param s A string corresponding to the desired Device.
      */
-    public int open(String s) {
+    public Optional<Integer> open(String s) {
         dbMes("Open() String: \"" + s + "\"");
 
         // Loop thru the list to find the first empty entry.
@@ -29,18 +31,18 @@ public class VFS implements Device{
                 if(temp.getDevIndex() != -1){   // If yes, add to the list and return it's index.
                     devices[i] = temp;
                     dbMes("");
-                    return i;
+                    return Optional.of(i);
                 }
                 else{                           // Otherwize, return failure.
                     dbMes("ERROR: Could not open Device.");
-                    return -1;
+                    return Optional.empty();
                 }
             }
         }
 
         // If no entries, return error code.
         dbMes("ERROR: No available entries.");
-        return -1;
+        return Optional.empty();
     }
 
     /**
@@ -63,14 +65,14 @@ public class VFS implements Device{
      * @param id The FID of the desired Device.
      * @param size The amount of data to be read.
      */
-    public byte[] read(int id, int size) {
+    public Optional<byte[]> read(int id, int size) {
         dbMes("Read(): FID: " + id + " Size: " + size);
 
         if (id >= 0 && id < Device.DEVICE_COUNT){
             return devices[id].read(size);
         }
         else{
-            return new byte[]{-1};
+            return Optional.empty();
         }
     }
 
@@ -95,14 +97,14 @@ public class VFS implements Device{
      * @param data The data to be writen to the device
      * @return The amount of data successfully writen to the Device.
      */
-    public int write(int id, byte[] data) {
+    public Optional<Integer> write(int id, byte[] data) {
         dbMes("Write(): FID: " + id);
 
         if (id >= 0 && id < Device.DEVICE_COUNT){
             return devices[id].write(data);
         }
         else{
-            return -1;
+            return Optional.empty();
         }
     }
     
@@ -123,7 +125,7 @@ public class VFS implements Device{
     private class DeviceMap{
 
         private Device dev;         // The type of device that this entry maps to.
-        private int devIndex = 0;   // The index for the file within the device.
+        private int devIndex = -1;   // The index for the file within the device.
 
         DeviceMap(String s){
             String deviceSpecifyer = s.substring(0, CODELEN);         // Device strings are only 4 char long in my implementation.
@@ -137,16 +139,24 @@ public class VFS implements Device{
                 dbMes("Case: File");
             }
             else{
-                dbMes("VFS: Invalid File Specifyer");
+                dbMes("Invalid File Specifyer: " + s);
                 devIndex = -1;
             }
 
-            devIndex = (devIndex == -1) ? 
-                -1 :                            // Keep the devIndex at -1 so the VFS knows it's invalid.
-                dev.open(s.substring(CODELEN)); // Pass the rest of the string to the devices's open().
+            if (dev != null){
+                
+                Optional<Integer> index = dev.open(deviceSpecifyer);
+
+                if (index.isPresent()){
+                    devIndex = index.get();
+                }
+                else {
+                    devIndex = -1;
+                }
+            }            
         }
 
-        public byte[] read(int size) {
+        public Optional<byte[]> read(int size) {
             return dev.read(devIndex, size);
         }
     
@@ -154,7 +164,7 @@ public class VFS implements Device{
             dev.seek(devIndex, to);
         }
     
-        public int write(byte[] data) {
+        public Optional<Integer> write(byte[] data) {
             return dev.write(devIndex, data);
         }
 

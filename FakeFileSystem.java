@@ -1,4 +1,5 @@
 import java.io.RandomAccessFile;
+import java.util.Optional;
 
 public class FakeFileSystem implements Device{
 
@@ -16,7 +17,7 @@ public class FakeFileSystem implements Device{
      * 
      * @param device The desired file's name.
      */
-    public int open(String s) {
+    public Optional<Integer> open(String s) {
 
         int fid = -1;
         s = s.trim();   // Trim any uneeded whitespace.
@@ -36,22 +37,22 @@ public class FakeFileSystem implements Device{
         if(fid == -1){
             // If we didn't find an open entry, return failure.
             dbMes("ERROR: No availible entry.");
-            return -1;
+            return Optional.empty();
         }
         else if (s != null && s.equals("") == false){
             // If the string is valid, open the file and return the fid.
             try{
                 files[fid] = new RandomAccessFile(s, "rw"); //Trim any whitespace from the string.
                 dbMes("FID: " + fid);
-                return fid;
+                return Optional.of(fid);
             }
             catch (Exception e){
                 dbMes("Open(): ERROR: " + e.getMessage());
-                return -1;
+                return Optional.empty();
             }
         }
         else 
-            return -1;
+            return Optional.empty();
     }
 
     /**
@@ -60,7 +61,7 @@ public class FakeFileSystem implements Device{
      * @param id The FID of the desired File.
      * @param size The amount of data to be read.
      */
-    public byte[] read(int id, int size) {
+    public Optional<byte[]> read(int id, int size) {
         byte[] retval = new byte[size];
 
         dbMes("Read()");
@@ -68,11 +69,11 @@ public class FakeFileSystem implements Device{
         try{
             files[id].read(retval);
             dbMes("Read: \"" + new String(retval) + "\"");
-            return retval;
+            return Optional.of(retval);
         }
         catch (Exception e){
             dbMes("Read(): ERROR: " + e.getMessage());
-            return new byte[]{-1};
+            return Optional.empty();
         }
     }
 
@@ -99,16 +100,16 @@ public class FakeFileSystem implements Device{
      * @param id The FID of the desired File.
      * @param data The data to be writen to the File.
      */
-    public int write(int id, byte[] data) {
+    public Optional<Integer> write(int id, byte[] data) {
         dbMes("Write() \"" + new String(data) + "\"");
 
         try{
             files[id].write(data);
-            return data.length;
+            return Optional.of(data.length);
         } 
         catch(Exception e){
             dbMes("Write(): ERROR: " + e.getMessage());
-            return -1;
+            return Optional.empty();
         }
     }
     

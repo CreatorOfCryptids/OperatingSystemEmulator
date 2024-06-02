@@ -27,7 +27,7 @@ public class Kernel implements Runnable{
         for(int i = 0; i<UserLandProcess.PAGE_COUNT; i++)
             freeMemMap[i] = true;
 
-        swapFID = vfs.open("FILE Swap.data");
+        swapFID = vfs.open("FILE Swap.data").get();
         swapIndex = 0;
 
         
@@ -154,10 +154,10 @@ public class Kernel implements Runnable{
     private void createProcess(Object up, Object priority){
 
         if (up instanceof UserLandProcess && priority instanceof OS.Priority)
-            OS.retval = scheduler.createProcess((UserLandProcess)up, (OS.Priority) priority);
+            OS.retval = Optional.of(scheduler.createProcess((UserLandProcess)up, (OS.Priority) priority));
         else{
             dbMes("Object passed to kernel.createProcess() was not a UserlandProcess");
-            OS.retval = -1;
+            OS.retval = Optional.empty();
         }
 
     }
@@ -194,17 +194,16 @@ public class Kernel implements Runnable{
     private void open(Object device){
         if (device instanceof String){
 
-
-            int index = vfs.open((String) device);
+            Optional<Integer> index = vfs.open((String) device);
             int pcbIndex = -1;
 
             // Check if the VFS opened the Device.
-            if(index != -1){        // On success, try to add to PCB's Device index.
-                dbMes("VFS didn't fail, index: " + index);
-                pcbIndex = scheduler.getCurrentlyRunning().open(index);
+            if(index.isPresent()){        // On success, try to add to PCB's Device index.
+                dbMes("VFS didn't fail, index: " + index.get());
+                pcbIndex = scheduler.getCurrentlyRunning().open(index.get());
 
                 if(pcbIndex == -1){  // If adding to PCB's index fails, close the correct vfs entry.
-                    vfs.close(index);
+                    vfs.close(index.get());
                     dbMes("PCB didn't have any availible room.");
                 }
                 else{
@@ -214,11 +213,11 @@ public class Kernel implements Runnable{
             else{
                 dbMes("VFS.open() failed.");
             }
-            OS.retval = pcbIndex;   // Return the pPCB's index to the ULP. Will be -1 on a failure.
+            OS.retval = Optional.of(pcbIndex);   // Return the pPCB's index to the ULP. Will be -1 on a failure.
         }
         else{
             dbMes("Object passed to Kernel.open() was not a string.");
-            OS.retval = -1;
+            OS.retval = Optional.empty();
         }
     }
 
@@ -239,12 +238,12 @@ public class Kernel implements Runnable{
             else{                
                 // If its outside the range, return failure.
                 dbMes("READ_ERROR: FID: " + (int) id + " out of bounds");
-                OS.retval = -1; 
+                OS.retval = Optional.empty(); 
             }
         }
         else{
             dbMes("Objects passed to Kernel.read() were not integers.");
-            OS.retval = -1;     // If Objects are not valid, return failure.
+            OS.retval = Optional.empty();     // If Objects are not valid, return failure.
         }
     }
 
@@ -287,12 +286,12 @@ public class Kernel implements Runnable{
             else{
                 // If its outside the range, return failure.
                 dbMes("WRITE_ERROR: FID " + (int) id + " out of bounds.");
-                OS.retval = -1; 
+                OS.retval = Optional.empty(); 
             }
         }
         else{
             dbMes("WRITE_ERROR: Objects passed to Kernel.write() were not of the right type.");
-            OS.retval = -1;
+            OS.retval = Optional.empty();
         }
     }
     
@@ -334,10 +333,10 @@ public class Kernel implements Runnable{
 
         // Check inputs
         if(name instanceof String){
-            OS.retval = scheduler.getPID((String) name);
+            OS.retval = Optional.of(scheduler.getPID((String) name));
         }
         else{
-            OS.retval = -1;
+            OS.retval = Optional.empty();
         }
     }
 
@@ -442,7 +441,7 @@ public class Kernel implements Runnable{
                     if (map.diskPageNum.isPresent()){
                         // Move banished data to disk
                         vfs.seek(swapFID, map.diskPageNum.get() * UserLandProcess.PAGE_SIZE);
-                        pageData = vfs.read(swapFID, UserLandProcess.PAGE_SIZE);
+                        pageData = vfs.read(swapFID, UserLandProcess.PAGE_SIZE).get();
 
                         for(int i = 0; i<UserLandProcess.PAGE_SIZE; i++){
                             UserLandProcess.memory[foundPage * UserLandProcess.PAGE_SIZE + i] = pageData[i];
@@ -486,11 +485,11 @@ public class Kernel implements Runnable{
             for (int i = 0; i< (int) size; i++)
                 VtPM[i] = new VirtualToPhysicalMap();
 
-            OS.retval = getCurrentlyRunning().allocateMemory(VtPM);
+            OS.retval = Optional.of(getCurrentlyRunning().allocateMemory(VtPM));
         }
         else{
             dbMes("Object passed to kernel is not an integer.");
-            OS.retval = -1;
+            OS.retval = Optional.empty();
         }
     }
     
@@ -498,7 +497,7 @@ public class Kernel implements Runnable{
      * Frees the designated memory for use by other processes.
      * 
      * @param pointer The begginging of the virtal memory to be freed.
-     * @param size THe amount of virtual memory to be freed.
+     * @param size THe amount of virtual pages to be freed.
      * @return True if the memory has been successfully freed. False if otherwize.
      */
     private void freeMemory(Object pointer, Object size) {
